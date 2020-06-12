@@ -3,6 +3,7 @@
 	<head>
 		<script src="webgl-debug.js"></script>
 		<script src="gl-matrix-min.js"></script>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<!-- Create and Initialize vertex shader -->
 		<script id="vShader" type="x-shader/x-vertex">
 			// Inputs of vertex shared
@@ -53,16 +54,6 @@
 			var vertexColorAttributePointer;
 			var perspectiveViewUniformPointer;
 			var transformUniformPointer;
-
-
-
-
-
-			// BHMA 0.3. Έχει δηλωθεί μία νέα global μεταβλητή για την αποθήκευση της διεύθυνσης του νέου uniform 
-		
-
-
-
 			var requestId=0; 
 
 			// Creates a WebGL context
@@ -284,16 +275,42 @@
 
 			function redraw() 
 			{	
+
+				// Get the user inputs 
+				var isRight = document.getElementsByName('x')[0].checked;
+				var isTop = document.getElementsByName('y')[0].checked;
+				var isFront = document.getElementsByName('z')[0].checked;
+				var camAngle = parseFloat(document.getElementById('cAngle').value);
+				var x, y, z;
+				var r = 5;
+			
+				// Calculate the camera angle from degrees to rad and prevent overflow
+				camAngle = (camAngle%360)*Math.PI/180.0;
+
+				// Determine camera position
+				if(isRight)
+					x = r;
+				else
+					x = -r;
+
+				if(isTop)
+					y = r;
+				else
+					y = -r;	
+
+				if(isFront)
+					z = r;
+				else
+					z = -r;	
+
 				// Create the view, perpective and combined matrices
 				var vMatrix = mat4.create();
 				var pMatrix = mat4.create();
 				var pvMatrix = mat4.create();
 				
-				// Set the the distance of the camera 
-				var r = 2;
-
+				
 				// Create the position of the camera
-				var pos = [r, r, r];
+				var pos = [x, y, z];
 
 				// Set where the camera is looking 
 				var view = [0, 0, 0];
@@ -305,7 +322,7 @@
 				mat4.lookAt(vMatrix, pos, view, top);
 					
 				// Fill the view perspective with the right values  (angle, dimension ratio, closest threshold, farthest threshold)				
-				mat4.perspective(pMatrix, Math.PI/2, 1, 0.01, 20);
+				mat4.perspective(pMatrix, camAngle, 1, 0.001, 10*camAngle);
 				
 				// Get the combined perspective and view matrix
 				mat4.multiply(pvMatrix, pMatrix, vMatrix);
@@ -386,13 +403,38 @@
 	</head>
 
 	<body onload="startup()">
-		<canvas id="myGLCanvas" >
-		</canvas>
-		<p>
-		Rotate by:<input type="text" id="angleText" value="1">
-		Camera Height by:<input type="text" id="ZText" value="0.01">
-		<button onClick=startAnim()>Start</button>
-		<button onClick=stopAnim()>Stop</button>
-		</p>
+		<div class="container-fluid style" style="margin-top: 2%; margin-left: 2%;">
+			<div class="row align-items-center">
+				<div class="col-8 justify-content-start">
+					<canvas id="myGLCanvas" >
+					</canvas>
+				</div>
+				<div class="col-4 align-middle">
+					<p>
+						Camera angle:
+						<input type="number" min="0" id="cAngle" value="90">
+						</br>
+						Camera position</br>
+						<input type="radio" id="Right" name="x" value="Right" checked="true">
+						<label for="Right">Right</label>
+						<input type="radio" id="Left" name="x" value="Left">
+						<label for="Left">Left</label><br>
+				
+						<input type="radio" id="Top" name="y" value="Top" checked="true">
+						<label for="Top">Top</label>
+						<input type="radio" id="Bottom" name="y" value="Bottom">
+						<label for="Bottom">Bottom</label><br>
+				
+						<input type="radio" id="Front" name="z" value="Front" checked="true">
+						<label for="Front">Front</label>
+						<input type="radio" id="Back" name="z" value="Back">
+						<label for="Back">Back</label><br>
+
+						<button onclick="redraw()">Submit</button>
+					</p>
+				</div>
+			</div>
+		</div>
+		
 	</body>
 </html>
