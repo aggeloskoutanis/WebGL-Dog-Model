@@ -4,17 +4,17 @@
 <script src="webgl-debug.js"></script>
 <script src="gl-matrix-min.js"></script>
 <script id="vShader" type="x-shader/x-vertex">
-	// Ο παρακάτω κώδικας δεν είναι Javascript αλλά GLSL (GL Shader Language)
+// Ο παρακάτω κώδικας δεν είναι Javascript αλλά GLSL (GL Shader Language)
 	attribute vec4 aVertexPosition; // attribute: παράμετρος εισόδου του shader
 	attribute vec4 aVertexColor;
-
+	
 	uniform mat4 uTransformMatrix; 
-
+	
 	// BHMA 0.1 Ένα νέο έξτρα uniform που θα υποδεχθεί τον πίνακα μετασχηματισμού προοπτικής/κάμερας (Perspective/View)
 	uniform mat4 uPerspectiveViewMatrix;	
-
+	
 	varying vec4 vColor; // varying: μεταβλητή εξόδου προς το fragment shader
-
+	
 	void main() {
 		// ΒΗΜΑ 0.2 Το νέο uniform uPerspectiveViewMatrix συμμετέχει στον πολλαπλασιασμό για τη θέση της κάθε κορυφής 
 		// (μετά από πιθανές μετακινήσεις κλπ. που περιέχονται στο uniform uTransformMatrix)
