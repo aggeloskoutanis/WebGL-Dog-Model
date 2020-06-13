@@ -282,7 +282,7 @@
 				var isFront = document.getElementsByName('z')[0].checked;
 				var camAngle = parseFloat(document.getElementById('cAngle').value);
 				var x, y, z;
-				var r = 5;
+				var camDistance = parseFloat(document.getElementById('cDistance').value);
 			
 				// Calculate the camera angle from degrees to rad and prevent overflow
 				camAngle = (camAngle%360)*Math.PI/180.0;
@@ -291,19 +291,19 @@
 
 				// Determine camera position
 				if(isRight)
-					x = r;
+					x = camDistance;
 				else
-					x = -r;
+					x = -camDistance;
 
 				if(isTop)
-					y = r;
+					y = camDistance;
 				else
-					y = -r;	
+					y = -camDistance;	
 
 				if(isFront)
-					z = r;
+					z = camDistance;
 				else
-					z = -r;	
+					z = -camDistance;	
 
 				// Create the view, perpective and combined matrices
 				var vMatrix = mat4.create();
@@ -324,7 +324,7 @@
 				mat4.lookAt(vMatrix, pos, view, top);
 					
 				// Fill the view perspective with the right values  (angle, dimension ratio, closest threshold, farthest threshold)				
-				mat4.perspective(pMatrix, camAngle, 1, 0.001, 10*camAngle);
+				mat4.perspective(pMatrix, camAngle, 1, 0.001, 10*camDistance);
 				
 				// Get the combined perspective and view matrix
 				mat4.multiply(pvMatrix, pMatrix, vMatrix);
@@ -411,32 +411,69 @@
 					<canvas id="myGLCanvas" >
 					</canvas>
 				</div>
-				<div class="col-4 align-middle">
-					<p>
-						Camera angle:
+				<div class="col-2 align-middle">
+					<div class="row justify-content-center mb-1">
+						<h1 class="mt-5">Camera angle</h1>
+					</div>
+						
+					<div class="row justify-content-center">
 						<input type="number" min="0" id="cAngle" value="90">
-						</br>
-						Camera position</br>
-						<input type="radio" id="Right" name="x" value="Right" checked="true">
-						<label for="Right">Right</label>
-						<input type="radio" id="Left" name="x" value="Left">
-						<label for="Left">Left</label><br>
-				
-						<input type="radio" id="Top" name="y" value="Top" checked="true">
-						<label for="Top">Top</label>
-						<input type="radio" id="Bottom" name="y" value="Bottom">
-						<label for="Bottom">Bottom</label><br>
-				
-						<input type="radio" id="Front" name="z" value="Front" checked="true">
-						<label for="Front">Front</label>
-						<input type="radio" id="Back" name="z" value="Back">
-						<label for="Back">Back</label><br>
+					</div>
 
-						<button onclick="redraw()">Submit</button>
-					</p>
+					<div class="row justify-content-center mt-1">
+						<h1 class="mt-5">Camera distance</h1>
+					</div>
+
+					<div class="row justify-content-center">
+						<input type="number" min="0" id="cDistance" value="5">
+					</div>
+
+					<div class="row justify-content-center mb-1">
+						<h1 class="mt-5">Camera position</h1>
+					</div>
+
+					<div class="row justify-content-around">
+						<div class="col-4">
+							<div>
+								<input type="radio" id="Right" name="x" value="Right" checked="true">
+								<label for="Right">Right</label>
+							</div>
+						
+							<div>
+								<input type="radio" id="Top" name="y" value="Top" checked="true">
+								<label for="Top">Top</label>
+							</div>
+							
+							<div>
+								<input type="radio" id="Front" name="z" value="Front" checked="true">
+								<label for="Front">Front</label>
+							</div>			
+						</div>
+						
+						<div class="col-4">
+							<div>
+								<input type="radio" id="Left" name="x" value="Left">
+								<label for="Left">Left</label>
+							</div>	
+
+							<div>
+								<input type="radio" id="Bottom" name="y" value="Bottom">
+								<label for="Bottom">Bottom</label>
+							</div>		
+							
+							<div>
+								<input type="radio" id="Back" name="z" value="Back">
+								<label for="Back">Back</label>
+							</div>				
+						</div>
+						
+					</div>
+					
+					<div class="row justify-content-center">
+						<button class="btn btn-secondary mt-4" onclick="redraw()">Submit</button>
+					</div>
 				</div>
 			</div>
 		</div>
-		
 	</body>
 </html>

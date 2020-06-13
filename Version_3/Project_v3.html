@@ -9,36 +9,40 @@
 			// Inputs of vertex shared
 			attribute vec4 aVertexPosition; // Input position
 			attribute vec4 aVertexColor; // Input color
-			
+			attribute vec2 aTextureCoordinates; // Input texture
+
 			// Vertices positional bias 
 			uniform mat4 uTransformMatrix; 
 			
 			// Camera perspective 
 			uniform mat4 uPerspectiveViewMatrix;	
 			
-			// color output
-			varying vec4 vColor; 
-			
+			// Texture output 
+			varying vec2 vTextureCoordinates;
+
 			void main() 
 			{
 				// Generate postion from positional bias and camera perspective 
 				gl_Position = uPerspectiveViewMatrix * uTransformMatrix * aVertexPosition; 
 				
-				// Set the colour of the vertex to be sent to the fshader
-				vColor = aVertexColor;  
+				// Set the the texture coordinates
+				vTextureCoordinates = aTextureCoordinates;    
 			} 
 		</script>
 		
 		<script id="fShader" type="x-shader/x-fragment">
 			precision mediump float; 
 
-			// Input vertex color from vertex shader 
-			varying vec4 vColor; 
+			// Input vertex texture from vertex shader
+			varying vec2 vTextureCoordinates;
+
+			// Create a uniform for the texture
+			uniform sampler2D uSampler;
 
 			void main() 
 			{
-				// Set the color of the vertex 
-				gl_FragColor = vColor;
+				// Set the color of the vertex according to the texture
+				gl_FragColor = texture2D(uSampler, vTextureCoordinates);
 			}
 		</script>
 
@@ -49,12 +53,47 @@
 			var shaderProgram; 
 			var vertexBuffer; 
 			var colorBuffer; 
-			var indexBuffer; 
+			var indexBuffer;
+			var textureBuffer; 
 			var vertexPositionAttributePointer;
 			var vertexColorAttributePointer;
 			var perspectiveViewUniformPointer;
+			var textureCoordinatesAttributePointer;
 			var transformUniformPointer;
-			var requestId=0; 
+			var requestId = 0; 
+			var totalCamRot = 0;
+			var totalHeight = 15;
+			var bodyTexture
+
+			async function loadImageForTexture(url, textureObject) {
+				// 	Create a new image object
+				var image = new Image();
+
+				// Do the below when the image loads
+				image.onload = function() 
+				{    
+					// Activate given texture as current
+					gl.bindTexture(gl.TEXTURE_2D, textureObject);
+
+					// Invert Y
+					gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+
+					// Copy image on activated texture
+					gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+					// Determine how new pixels are generated (if needed)
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+					// Determine how the pixels will be merged (if needed)
+					gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+					
+					// Generate MipMap
+					gl.generateMipmap(gl.TEXTURE_2D);				
+				}
+					
+				// Load image
+				image.src = url;
+			}
 
 			// Creates a WebGL context
 			function createGLContext(canvas) 
@@ -120,17 +159,20 @@
 
 				gl.useProgram(shaderProgram); 
 
-				// Get pointers to the vertex postion and color inputs of vShader
+				// Get pointers to the vertex postion and texture color inputs of vShader
 				vertexPositionAttributePointer = gl.getAttribLocation(shaderProgram, "aVertexPosition"); 
-				vertexColorAttributePointer = gl.getAttribLocation(shaderProgram, "aVertexColor"); 
+				textureCoordinatesAttributePointer = gl.getAttribLocation(shaderProgram, "aTextureCoordinates");
 
 				// Enable the inputs of the vShader
 				gl.enableVertexAttribArray(vertexPositionAttributePointer); 
-				gl.enableVertexAttribArray(vertexColorAttributePointer);
+				gl.enableVertexAttribArray(textureCoordinatesAttributePointer);
 				
 				// Get pointers to the tranform and perpective uniforms
 				transformUniformPointer = gl.getUniformLocation(shaderProgram, "uTransformMatrix"); 
 				perspectiveViewUniformPointer = gl.getUniformLocation(shaderProgram, "uPerspectiveViewMatrix");
+
+				// Get pointer to the sampler uniform 
+				samplerUniformPointer = gl.getUniformLocation(shaderProgram, "uSampler");
 			}
 
 			// Creates the buffers for the shapes to de drawn
@@ -186,104 +228,6 @@
 				vertexBuffer.itemSize = 4; 
 				vertexBuffer.numberOfItems = 24; 
 
-				// Create the red color buffer
-				redColorBuffer=gl.createBuffer(); 
-				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
-
-				// Setup the color for each of the above corners 
-				var redColorVertices = 
-				[
-					// Left
-					0.45, 0.08, 0, 1,
-					0.45, 0.08, 0, 1,
-					0.45, 0.08, 0, 1,
-					0.45, 0.08, 0, 1,
-
-					// Top
-					0.52, 0.09, 0, 1,
-					0.52, 0.09, 0, 1,
-					0.52, 0.09, 0, 1,
-					0.52, 0.09, 0, 1,
-					
-					// Right
-					0.59, 0.1, 0, 1,
-					0.59, 0.1, 0, 1,
-					0.59, 0.1, 0, 1,
-					0.59, 0.1, 0, 1,
-					
-					// Bottom
-					0.66, 0.11, 0, 1,
-					0.66, 0.11, 0, 1,
-					0.66, 0.11, 0, 1,
-					0.66, 0.11, 0, 1,
-					
-					// Back
-					0.73, 0.13, 0, 1,
-					0.73, 0.13, 0, 1,
-					0.73, 0.13, 0, 1,
-					0.73, 0.13, 0, 1,
-					
-					// Front
-					0.8, 0.14, 0, 1,
-					0.8, 0.14, 0, 1,
-					0.8, 0.14, 0, 1,
-					0.8, 0.14, 0, 1,
-				];
-
-				// Load the buffer with the above data 					
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(redColorVertices),	gl.STATIC_DRAW);
-				redColorBuffer.itemSize=4;
-				redColorBuffer.numberOfItems=24;
-
-				// Create the red color buffer
-				yellowColorBuffer=gl.createBuffer(); 
-				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
-
-				// Setup the color for each of the above corners 
-				var yellowColorVertices = 
-				[
-					// Left
-					1.0, 0.75, 0.0, 1,
-					1.0, 0.75, 0.0, 1,
-					1.0, 0.75, 0.0, 1,
-					1.0, 0.75, 0.0, 1,
-
-					// Top
-					1.0, 0.85, 0.0, 1,
-					1.0, 0.85, 0.0, 1,
-					1.0, 0.85, 0.0, 1,
-					1.0, 0.85, 0.0, 1,
-					
-					// Right
-					0.89, 0.8, 0.04, 1,
-					0.89, 0.8, 0.04, 1,
-					0.89, 0.8, 0.04, 1,
-					0.89, 0.8, 0.04, 1,
-					
-					// Bottom
-					0.98, 0.92, 0.36, 1,
-					0.98, 0.92, 0.36, 1,
-					0.98, 0.92, 0.36, 1,
-					0.98, 0.92, 0.36, 1,
-					
-					// Back
-					0.99, 0.93, 0.0, 1,
-					0.99, 0.93, 0.0, 1,
-					0.99, 0.93, 0.0, 1,
-					0.99, 0.93, 0.0, 1,
-					
-					// Front
-					1.0, 1.0, 0.0, 1,
-					1.0, 1.0, 0.0, 1,
-					1.0, 1.0, 0.0, 1,
-					1.0, 1.0, 0.0, 1,
-				];
-
-				// Load the buffer with the above data 					
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(yellowColorVertices),	gl.STATIC_DRAW);
-				yellowColorBuffer.itemSize=4;
-				yellowColorBuffer.numberOfItems=24;
-
 				// Create a buffer for the triangles
 				indexBuffer = gl.createBuffer(); 
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer); 
@@ -315,52 +259,89 @@
 					20, 21, 22,
 					21, 22, 23
 				];
-
+				
 				// Load the buffer with the above data 					
 				gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint16Array(indexMatrix),gl.STATIC_DRAW);   
 				indexBuffer.itemSize=1; 
-				indexBuffer.numberOfItems = 36;  
+				indexBuffer.numberOfItems = 36;
+
+				// Create the texture buffer
+				textureBuffer = gl.createBuffer();
+				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+				var textureCoordinates=[
+					// Left
+					-1.0, -1.0,
+					-1.0, 1.0,
+					1.0, -1.0,
+					1.0, 1.0,
+
+					// Top
+					-1.0, -1.0,
+					-1.0, 1.0,
+					1.0, -1.0,
+					1.0, 1.0,	
+
+					// Right
+					-1.0, -1.0,
+					-1.0, 1.0,
+					1.0, -1.0,
+					1.0, 1.0,
+		
+					// Bottom
+					-1.0, -1.0,
+					-1.0, 1.0,
+					1.0, -1.0,
+					1.0, 1.0,			
+
+					// Back
+					-1.0, -1.0,
+					-1.0, 1.0,
+					1.0, -1.0,
+					1.0, 1.0,
+
+					// Front
+					-1.0, -1.0,
+					-1.0, 1.0,
+					1.0, -1.0,
+					1.0, 1.0,
+				];
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates),gl.STATIC_DRAW);  
+				textureBuffer.itemSize = 2;
+				textureBuffer.numberOfItems = 24;
+
+				// Load body texture
+				bodyTexture = gl.createTexture();
+				var bodyTextureUrl = "body-texture.png";
+				loadImageForTexture(bodyTextureUrl, bodyTexture);
 			}
 
 			function redraw() 
 			{	
-
-				// Get the user inputs 
-				var isRight = document.getElementsByName('x')[0].checked;
-				var isTop = document.getElementsByName('y')[0].checked;
-				var isFront = document.getElementsByName('z')[0].checked;
+				// Get the user inputs
 				var camAngle = parseFloat(document.getElementById('cAngle').value);
-				var x, y, z;
 				var camDistance = parseFloat(document.getElementById('cDistance').value);
-			
+				var camRot = parseFloat(document.getElementById('rAngle').value);
+				var camHeight = parseFloat(document.getElementById('cHeight').value);
+
 				// Calculate the camera angle from degrees to rad and prevent overflow
 				camAngle = (camAngle%360)*Math.PI/180.0;
-
-				console.log(camAngle)
-
-				// Determine camera position
-				if(isRight)
-					y = camDistance;
-				else
-					y = -camDistance;
-
-				if(isTop)
-					z = camDistance;
-				else
-					z = -camDistance;	
-
-				if(isFront)
-					x = camDistance;
-				else
-					x = -camDistance;	
-
+				
+				// Calculate the camera rotation from degrees to rad and prevent overflow
+				camRot = camRot*Math.PI/180.0;
+				
+				// Calculate the total camera rotation
+				totalCamRot = (totalCamRot + camRot)%(2*Math.PI);
+				
+				// Calculate the total camera height
+				totalHeight = totalHeight + camHeight;
+				 
 				// Create the view, perpective and combined matrices
 				var vMatrix = mat4.create();
 				var pMatrix = mat4.create();
 				var pvMatrix = mat4.create();
 				
 				// Create the position of the camera
-				var pos = [x, y, z];
+				var pos = [camDistance * Math.cos(totalCamRot), camDistance * Math.sin(totalCamRot), totalHeight];
 
 				// Set where the camera is looking 
 				var view = [0, 0, 0];
@@ -372,8 +353,7 @@
 				mat4.lookAt(vMatrix, pos, view, top);
 					
 				// Fill the view perspective with the right values  (angle, dimension ratio, closest threshold, farthest threshold)				
-				// mat4.perspective(pMatrix, camAngle, 1, 0.001, 10*camAngle);
-				mat4.perspective(pMatrix, camAngle, 1, 0.001, 10*camDistance);
+				mat4.perspective(pMatrix, camAngle, 1, 0.001, 10000);
 				
 				// Get the combined perspective and view matrix
 				mat4.multiply(pvMatrix, pMatrix, vMatrix);
@@ -395,9 +375,14 @@
 				
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer); 
 
-				// Push yellow color to fragment shader
-				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, yellowColorBuffer.itemSize, gl.FLOAT, false, 0, 0); 
+				// Activate a texture
+				gl.activeTexture(gl.TEXTURE0);
+
+				// Bind texture pointer with the loaded texture
+				gl.bindTexture(gl.TEXTURE_2D, bodyTexture);
+				gl.uniform1i(samplerUniformPointer, 0);
+				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+				gl.vertexAttribPointer(textureCoordinatesAttributePointer, textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
 				// Body
 				mat4.fromTranslation(TranslationMatrix, [-1, 0, 7.5]);
@@ -422,10 +407,6 @@
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
-				
-				// Push red color to fragment shader
-				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, redColorBuffer.itemSize, gl.FLOAT, false, 0, 0); 
 
 				// Left back paw
 				mat4.fromTranslation(TranslationMatrix, [-5.5, 4.5, 1]);
@@ -547,7 +528,7 @@
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 	
 
 				// Draw the first scene
-				redraw(); 
+				startAnim(); 
 			}
 
 			function startAnim() 
@@ -577,8 +558,8 @@
 					</canvas>
 				</div>
 				<div class="col-2 align-middle">
-					<div class="row justify-content-center mb-1">
-						<h1 class="mt-5">Camera angle</h1>
+					<div class="row justify-content-center mt-1">
+						<h1 class="mt-3">Camera angle</h1>
 					</div>
 						
 					<div class="row justify-content-center">
@@ -586,57 +567,33 @@
 					</div>
 
 					<div class="row justify-content-center mt-1">
-						<h1 class="mt-5">Camera distance</h1>
+						<h1 class="mt-3">Camera distance</h1>
 					</div>
 
 					<div class="row justify-content-center">
-						<input type="number" min="0" id="cDistance" value="20">
+						<input type="number" min="0" id="cDistance" value="25">
 					</div>
-
-					<div class="row justify-content-center mb-1">
-						<h1 class="mt-5">Camera position</h1>
+					<div class="row justify-content-center mt-1">
+						<h1 class="mt-3">Rotation angle</h1>
 					</div>
-
-					<div class="row justify-content-around">
-						<div class="col-4">
-							<div>
-								<input type="radio" id="Right" name="x" value="Right" checked="true">
-								<label for="Right">Right</label>
-							</div>
 						
-							<div>
-								<input type="radio" id="Top" name="y" value="Top" checked="true">
-								<label for="Top">Top</label>
-							</div>
-							
-							<div>
-								<input type="radio" id="Front" name="z" value="Front" checked="true">
-								<label for="Front">Front</label>
-							</div>			
-						</div>
-						
-						<div class="col-4">
-							<div>
-								<input type="radio" id="Left" name="x" value="Left">
-								<label for="Left">Left</label>
-							</div>	
-
-							<div>
-								<input type="radio" id="Bottom" name="y" value="Bottom">
-								<label for="Bottom">Bottom</label>
-							</div>		
-							
-							<div>
-								<input type="radio" id="Back" name="z" value="Back">
-								<label for="Back">Back</label>
-							</div>				
-						</div>
-						
-					</div>
-					
 					<div class="row justify-content-center">
-						<button class="btn btn-secondary mt-4" onclick="redraw()">Submit</button>
+						<input type="number" min="0" id="rAngle" value="1">
 					</div>
+
+					<div class="row justify-content-center mt-1">
+						<h1 class="mt-3">Camera height</h1>
+					</div>
+
+					<div class="row justify-content-center">
+						<input type="number" id="cHeight" value="0.1">
+					</div>
+
+					<div class="row justify-content-center mt-4">
+						<button class="btn btn-secondary mr-3" onclick="startAnim()">Start</button>
+						<button class="btn btn-secondary ml-3" onclick="stopAnim()">Stop</button>
+					</div>
+
 				</div>
 			</div>
 		</div>
