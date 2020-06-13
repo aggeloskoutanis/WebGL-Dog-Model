@@ -186,54 +186,103 @@
 				vertexBuffer.itemSize = 4; 
 				vertexBuffer.numberOfItems = 24; 
 
-				// Create the color buffer
-				colorBuffer=gl.createBuffer(); 
-				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+				// Create the red color buffer
+				redColorBuffer=gl.createBuffer(); 
+				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
 
 				// Setup the color for each of the above corners 
-				var colorVertices = 
+				var redColorVertices = 
 				[
 					// Left
-					0.05, 0.25, 0.07, 1,
-					0.05, 0.25, 0.07, 1,
-					0.05, 0.25, 0.07, 1,
-					0.05, 0.25, 0.07, 1,
+					0.45, 0.08, 0, 1,
+					0.45, 0.08, 0, 1,
+					0.45, 0.08, 0, 1,
+					0.45, 0.08, 0, 1,
 
 					// Top
-					0.07, 0.35, 0.1, 1,
-					0.07, 0.35, 0.1, 1,
-					0.07, 0.35, 0.1, 1,
-					0.07, 0.35, 0.1, 1,
-
+					0.52, 0.09, 0, 1,
+					0.52, 0.09, 0, 1,
+					0.52, 0.09, 0, 1,
+					0.52, 0.09, 0, 1,
+					
 					// Right
-					0.09, 0.45, 0.13, 1,
-					0.09, 0.45, 0.13, 1,
-					0.09, 0.45, 0.13, 1,
-					0.09, 0.45, 0.13, 1,
-
+					0.59, 0.1, 0, 1,
+					0.59, 0.1, 0, 1,
+					0.59, 0.1, 0, 1,
+					0.59, 0.1, 0, 1,
+					
 					// Bottom
-					0.11, 0.55, 0.15, 1,
-					0.11, 0.55, 0.15, 1,
-					0.11, 0.55, 0.15, 1,
-					0.11, 0.55, 0.15, 1,
-
+					0.66, 0.11, 0, 1,
+					0.66, 0.11, 0, 1,
+					0.66, 0.11, 0, 1,
+					0.66, 0.11, 0, 1,
+					
 					// Back
-					0.13, 0.65, 0.18, 1,
-					0.13, 0.65, 0.18, 1,
-					0.13, 0.65, 0.18, 1,
-					0.13, 0.65, 0.18, 1,
-
+					0.73, 0.13, 0, 1,
+					0.73, 0.13, 0, 1,
+					0.73, 0.13, 0, 1,
+					0.73, 0.13, 0, 1,
+					
 					// Front
-					0.17, 0.85, 0.24, 1,
-					0.17, 0.85, 0.24, 1,
-					0.17, 0.85, 0.24, 1,
-					0.17, 0.85, 0.24, 1,
+					0.8, 0.14, 0, 1,
+					0.8, 0.14, 0, 1,
+					0.8, 0.14, 0, 1,
+					0.8, 0.14, 0, 1,
 				];
 
 				// Load the buffer with the above data 					
-				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorVertices),	gl.STATIC_DRAW);
-				colorBuffer.itemSize=4;
-				colorBuffer.numberOfItems=24;
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(redColorVertices),	gl.STATIC_DRAW);
+				redColorBuffer.itemSize=4;
+				redColorBuffer.numberOfItems=24;
+
+				// Create the red color buffer
+				yellowColorBuffer=gl.createBuffer(); 
+				gl.bindBuffer(gl.ARRAY_BUFFER, yellowColorBuffer);
+
+				// Setup the color for each of the above corners 
+				var yellowColorVertices = 
+				[
+					// Left
+					0.45, 0.08, 0, 1,
+					0.45, 0.08, 0, 1,
+					0.45, 0.08, 0, 1,
+					0.45, 0.08, 0, 1,
+
+					// Top
+					0.52, 0.09, 0, 1,
+					0.52, 0.09, 0, 1,
+					0.52, 0.09, 0, 1,
+					0.52, 0.09, 0, 1,
+					
+					// Right
+					0.59, 0.1, 0, 1,
+					0.59, 0.1, 0, 1,
+					0.59, 0.1, 0, 1,
+					0.59, 0.1, 0, 1,
+					
+					// Bottom
+					0.66, 0.11, 0, 1,
+					0.66, 0.11, 0, 1,
+					0.66, 0.11, 0, 1,
+					0.66, 0.11, 0, 1,
+					
+					// Back
+					0.73, 0.13, 0, 1,
+					0.73, 0.13, 0, 1,
+					0.73, 0.13, 0, 1,
+					0.73, 0.13, 0, 1,
+					
+					// Front
+					0.8, 0.14, 0, 1,
+					0.8, 0.14, 0, 1,
+					0.8, 0.14, 0, 1,
+					0.8, 0.14, 0, 1,
+				];
+
+				// Load the buffer with the above data 					
+				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(yellowColorVertices),	gl.STATIC_DRAW);
+				yellowColorBuffer.itemSize=4;
+				yellowColorBuffer.numberOfItems=24;
 
 				// Create a buffer for the triangles
 				indexBuffer = gl.createBuffer(); 
@@ -340,8 +389,8 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				
-				gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-				gl.vertexAttribPointer(vertexColorAttributePointer, colorBuffer.itemSize, gl.FLOAT, false, 0, 0); 
+				gl.bindBuffer(gl.ARRAY_BUFFER, redColorBuffer);
+				gl.vertexAttribPointer(vertexColorAttributePointer, redColorBuffer.itemSize, gl.FLOAT, false, 0, 0); 
 				
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer); 
 
@@ -524,32 +573,61 @@
 					<canvas id="myGLCanvas" >
 					</canvas>
 				</div>
-				<div class="col-4 align-middle">
-					<p>
-						Camera angle:
+				<div class="col-2 align-middle">
+					<div class="row justify-content-center mb-1">
+						<h1>Camera angle</h1>
+					</div>
+						
+					<div class="row justify-content-center">
 						<input type="number" min="0" id="cAngle" value="90">
-						</br>
-						Camera position</br>
-						<input type="radio" id="Right" name="x" value="Right" checked="true">
-						<label for="Right">Right</label>
-						<input type="radio" id="Left" name="x" value="Left">
-						<label for="Left">Left</label><br>
-				
-						<input type="radio" id="Top" name="y" value="Top" checked="true">
-						<label for="Top">Top</label>
-						<input type="radio" id="Bottom" name="y" value="Bottom">
-						<label for="Bottom">Bottom</label><br>
-				
-						<input type="radio" id="Front" name="z" value="Front" checked="true">
-						<label for="Front">Front</label>
-						<input type="radio" id="Back" name="z" value="Back">
-						<label for="Back">Back</label><br>
+					</div>
+						
+					<div class="row justify-content-center mb-1">
+						<h1 class="mt-5">Camera position</h1>
+					</div>
 
-						<button onclick="redraw()">Submit</button>
-					</p>
+					<div class="row justify-content-around">
+						<div class="col-4">
+							<div>
+								<input type="radio" id="Right" name="x" value="Right" checked="true">
+								<label for="Right">Right</label>
+							</div>
+						
+							<div>
+								<input type="radio" id="Top" name="y" value="Top" checked="true">
+								<label for="Top">Top</label>
+							</div>
+							
+							<div>
+								<input type="radio" id="Front" name="z" value="Front" checked="true">
+								<label for="Front">Front</label>
+							</div>			
+						</div>
+						
+						<div class="col-4">
+							<div>
+								<input type="radio" id="Left" name="x" value="Left">
+								<label for="Left">Left</label>
+							</div>	
+
+							<div>
+								<input type="radio" id="Bottom" name="y" value="Bottom">
+								<label for="Bottom">Bottom</label>
+							</div>		
+							
+							<div>
+								<input type="radio" id="Back" name="z" value="Back">
+								<label for="Back">Back</label>
+							</div>				
+						</div>
+						
+					</div>
+					
+					<div class="row justify-content-center">
+						<button class="btn btn-secondary mt-4" onclick="redraw()">Submit</button>
+					</div>
 				</div>
 			</div>
 		</div>
-		
 	</body>
 </html>
