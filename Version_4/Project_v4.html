@@ -83,17 +83,25 @@
 			var headAnimStep = 0.05;
 			var headAnimDirection = 1;
 
-			var tailAnimZ = 0;
+			var tailAnimX = 0;
 			var tailAnimStep = 0.05;
 			var tailAnimDirection = 1;
 
-			var FLPAnimZ = 0;
+			var FLPAnimY = 0;
 			var FLPAnimStep = 0.05;
 			var FLPAnimDirection = 1;
 
-			var FRPAnimZ = 0;
+			var FRPAnimY = 0;
 			var FRPAnimStep = 0.05;
 			var FRPAnimDirection = 1;
+
+			var playDeadAnimX = 0;
+			var playDeadAnimStep = 0.05;
+			var playDeadAnimDirection = 1;
+
+			var staticWalkAnimY = 0;
+			var staticWalkAnimStep = 0.05;
+			var staticWalkAnimDirection = 1;
 
 			function loadImageForTexture(url, textureObject) {
 				// 	Create a new image object
@@ -580,6 +588,9 @@
 				mat4.fromScaling(ScaleMatrix, [7, 3, 2.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -587,6 +598,9 @@
 				mat4.fromTranslation(TranslationMatrix, [4, 0, 11.5]);
 				mat4.fromScaling(ScaleMatrix, [2, 2, 1.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -596,6 +610,12 @@
 				mat4.fromScaling(ScaleMatrix, [2.5, 1.5, 1])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, false, -1);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);	
 
@@ -603,6 +623,12 @@
 				mat4.fromTranslation(TranslationMatrix, [-5.5, -4.5, 1]);
 				mat4.fromScaling(ScaleMatrix, [2.5, 1.5, 1])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
+
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, false, 1);
+
+				// Apply the animation for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -612,8 +638,14 @@
 				mat4.fromScaling(ScaleMatrix, [2.5, 1.5, 1])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, true, 1);
+
 				// Apply the animation for the left leg
 				TrSc = FLPAnimation(TrSc);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -626,6 +658,12 @@
 				// Apply the animation for the right leg
 				TrSc = FRPAnimation(TrSc);
 
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, true, -1);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -634,6 +672,12 @@
 				mat4.fromScaling(ScaleMatrix, [1.5, 1.5, 3])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, false, -1);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);	
 
@@ -641,6 +685,12 @@
 				mat4.fromTranslation(TranslationMatrix, [-6.5, -4.5, 5]);
 				mat4.fromScaling(ScaleMatrix, [1.5, 1.5, 3])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
+
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, false, 1);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -653,6 +703,12 @@
 				// Apply the animation for the left leg
 				TrSc = FLPAnimation(TrSc);
 
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, true, 1);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -663,6 +719,12 @@
 
 				// Apply the animation for the left leg
 				TrSc = FRPAnimation(TrSc);
+
+				// Apply the animation for the static walk animation
+				TrSc = staticWalk(TrSc, true, -1);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -675,6 +737,9 @@
 				// Apply the animation for the tail
 				TrSc = tailAnimation(TrSc);
 
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 				
@@ -686,6 +751,9 @@
 				// Apply the animation for the head
 				TrSc = headAnimation(TrSc);
 
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -696,6 +764,9 @@
 
 				// Apply the animation for the head
 				TrSc = headAnimation(TrSc);
+
+				// Apply the animation	 for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -716,6 +787,9 @@
 
 				// Apply the animation for the head
 				TrSc = headAnimation(TrSc);
+
+				// Apply the animation for the play dead animation
+				TrSc = playDead(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -772,6 +846,12 @@
 				var isFLPaw = document.getElementById('FrontLeftPaw').checked;
 				var isFRPaw = document.getElementById('FrontRightPaw').checked;
 				var isTail = document.getElementById('Tail').checked;
+				var isCamera = document.getElementById('cHeight').checked;
+				var isPlayDead = document.getElementById('playDead').checked;
+				var isStaticWalk = document.getElementById('staticWalk').checked;
+				var isNormalWalk = document.getElementById('normalWalk').checked;
+				var isDachshund = document.getElementById('dachshund').checked;
+				var isCartoon = document.getElementById('cartoon').checked;
 
 				if(isHead)
 				{
@@ -782,40 +862,64 @@
 					// Calculate new rotation angle
 					headAnimZ = headAnimZ + headAnimDirection * headAnimStep;
 				}
-				else if(isTail)
+
+				if(isTail)
 				{
 					// If the angle is going to be bigger than 90 degrees change direction
-					if(Math.abs(tailAnimZ + tailAnimDirection * tailAnimStep) >= Math.PI/2)
+					if(Math.abs(tailAnimX + tailAnimDirection * tailAnimStep) >= Math.PI/2)
 						tailAnimDirection *= -1;
 
 					// Calculate new rotation angle
-					tailAnimZ = tailAnimZ + tailAnimDirection * tailAnimStep;
+					tailAnimX = tailAnimX + tailAnimDirection * tailAnimStep;
 				}
-				else if(isFLPaw)
+
+				if(isFLPaw)
 				{
 					// If the angle is going to be bigger than 90 degrees change direction
-					if(FLPAnimZ + FLPAnimDirection * FLPAnimStep <= -Math.PI/2 || FLPAnimZ + FLPAnimDirection * FLPAnimStep > 0)
+					if(FLPAnimY + FLPAnimDirection * FLPAnimStep <= -Math.PI/2 || FLPAnimY + FLPAnimDirection * FLPAnimStep > 0)
 						FLPAnimDirection *= -1;
 
 					// Calculate new rotation angle
-					FLPAnimZ = FLPAnimZ + FLPAnimDirection * FLPAnimStep;
+					FLPAnimY = FLPAnimY + FLPAnimDirection * FLPAnimStep;
 				}
-				else if(isFRPaw)
+				
+				if(isFRPaw)
 				{
 					// If the angle is going to be bigger than 90 degrees change direction
-					if(FRPAnimZ + FRPAnimDirection * FRPAnimStep <= -Math.PI/2 || FRPAnimZ + FRPAnimDirection * FRPAnimStep > 0)
+					if(FRPAnimY + FRPAnimDirection * FRPAnimStep <= -Math.PI/2 || FRPAnimY + FRPAnimDirection * FRPAnimStep > 0)
 						FRPAnimDirection *= -1;
 
 					// Calculate new rotation angle
-					FRPAnimZ = FRPAnimZ + FRPAnimDirection * FRPAnimStep;
+					FRPAnimY = FRPAnimY + FRPAnimDirection * FRPAnimStep;
 				}
-				else
+				
+				if(isCamera)
 				{
 					// Change camera distance accordingly
 					if (event.deltaY > 0 && camDistance <= 10000)
 						camDistance = camDistance*1.03;
 					else if(event.deltaY < 0 && camDistance >= 0.001)
 						camDistance = camDistance*0.97;
+				}
+
+				if(isPlayDead)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(playDeadAnimX + playDeadAnimDirection * playDeadAnimStep <= -Math.PI/2 || playDeadAnimX + playDeadAnimDirection * playDeadAnimStep > 0)
+						playDeadAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					playDeadAnimX = playDeadAnimX + playDeadAnimDirection * playDeadAnimStep;
+				}
+
+				if(isStaticWalk)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep) >= Math.PI/2)
+						staticWalkAnimDirection *= -1;
+
+					// Calculate new rotation angles
+					staticWalkAnimY = staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep;
 				}
 					
 				// Redraw frame
@@ -894,7 +998,7 @@
 				mat4.multiply(part, tmp, part)
 
 				// Calculate Rotation for the animation  and rotate the part
-				mat4.fromRotation(FLPAnimRotationMatrix, FLPAnimZ, [0, 1, 0]);
+				mat4.fromRotation(FLPAnimRotationMatrix, FLPAnimY, [0, 1, 0]);
 				mat4.multiply(part, FLPAnimRotationMatrix, part)
 
 				// Translate part to iniital position
@@ -914,7 +1018,7 @@
 				mat4.multiply(part, tmp, part)
 
 				// Calculate Rotation for the animation  and rotate the part
-				mat4.fromRotation(FRPAnimRotationMatrix, FRPAnimZ, [0, 1, 0]);
+				mat4.fromRotation(FRPAnimRotationMatrix, FRPAnimY, [0, 1, 0]);
 				mat4.multiply(part, FRPAnimRotationMatrix, part)
 
 				// Translate part to iniital position
@@ -934,13 +1038,69 @@
 				mat4.multiply(part, tmp, part)
 
 				// Calculate Rotation for the animation  and rotate the part
-				mat4.fromRotation(tailAnimRotationMatrix, tailAnimZ, [1, 0, 0]);
+				mat4.fromRotation(tailAnimRotationMatrix, tailAnimX, [1, 0, 0]);
 				mat4.multiply(part, tailAnimRotationMatrix, part)
 
 				// Translate part to iniital position
 				mat4.fromTranslation(tmp, [0, 0, 9])
 				mat4.multiply(part, tmp, part)
 
+				return part;
+			}
+
+			function playDead(part)
+			{
+				var tailAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+
+				// Translate the part to the right position 
+				mat4.fromTranslation(tmp, [0, -6, 0])
+				mat4.multiply(part, tmp, part)
+
+				// Calculate Rotation for the animation  and rotate the part
+				mat4.fromRotation(tailAnimRotationMatrix, playDeadAnimX, [1, 0, 0]);
+				mat4.multiply(part, tailAnimRotationMatrix, part)
+
+				// Translate part to iniital position
+				mat4.fromTranslation(tmp, [0, 6, 0])
+				mat4.multiply(part, tmp, part)
+
+				return part;
+			}
+
+			function staticWalk(part, isfront, direction)
+			{
+				var staticWalkAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+
+				if(isfront)
+				{
+					// Translate the part to the right position 
+					mat4.fromTranslation(tmp, [-5.5, 0, -6.5])
+					mat4.multiply(part, tmp, part)
+
+					// Calculate Rotation for the animation  and rotate the part
+					mat4.fromRotation(staticWalkAnimRotationMatrix, direction*staticWalkAnimY, [0, 1, 0]);
+					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
+
+					// Translate part to iniital position
+					mat4.fromTranslation(tmp, [5.5, 0, 6.5])
+					mat4.multiply(part, tmp, part)
+				}
+				else
+				{
+					// Translate the part to the right position 
+					mat4.fromTranslation(tmp, [5.5, 0, -6.5])
+					mat4.multiply(part, tmp, part)
+
+					// Calculate Rotation for the animation  and rotate the part
+					mat4.fromRotation(staticWalkAnimRotationMatrix, direction*staticWalkAnimY, [0, 1, 0]);
+					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
+
+					// Translate part to iniital position
+					mat4.fromTranslation(tmp, [-5.5, 0, 6.5])
+					mat4.multiply(part, tmp, part)
+				}
 				return part;
 			}
 
@@ -972,11 +1132,11 @@
 	<body onload="startup()">
 		<div class="container-fluid style" style="margin-top: 2%; margin-left: 2%;">
 			<div class="row align-items-center">
-				<div class="col-8 justify-content-start">
+				<div class="col justify-content-start">
 					<canvas id="myGLCanvas" >
 					</canvas>
 				</div>
-				<div class="col-2 align-middle">
+				<div class="col align-middle">
 					<div class="row justify-content-center mt-1">
 						<h1 class="mt-3">Camera angle</h1>
 					</div>
@@ -986,40 +1146,74 @@
 					</div>
 
 					<div class="row justify-content-center mt-1">
-						<h1 class="mt-5">Animation</h1>
+						<h1 class="mt-5">Movements</h1>
 					</div>
 
 					<div class="row justify-content-center">
-						<div class="col-8">
-							<div>
-								<input type="radio" id="Head" name="animation" value="Head">
-								<label for="Head">Head</label>
+						<div clas="col">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="Head">
+								<label class="form-check-label" for="Head">Head</label>
 							</div>
-						
-							<div>
-								<input type="radio" id="FrontLeftPaw" name="animation" value="FrontLeftPaw">
-								<label for="FrontLeftPaw">Front Left Paw</label>
+	
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="FrontLeftPaw">
+								<label class="form-check-label" for="FrontLeftPaw">Front Left Paw</label>
+							</div>
+	
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="FrontRightPaw">
+								<label class="form-check-label" for="FrontRightPaw">Front Right Paw</label>
+							</div>
+	
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="Tail">
+								<label class="form-check-label" for="Tail">Tail</label>
+							</div>
+
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" value="" id="cHeight">
+								<label class="form-check-label" for="cHeight">Camera height</label>
 							</div>
 						</div>
 					</div>
+
+					<div class="row justify-content-center mt-1">
+						<h1 class="mt-5">Animations</h1>
+					</div>
+
+					<div class="row justify-content-center mt-1">
+						<div class="col-4">
+							<div>
+								<input type="radio" id="playDead" name="anim" value="playDead">
+								<label for="Left">Play Dead</label>
+							</div>	
+
+							<div>
+								<input type="radio" id="staticWalk" name="anim" value="staticWalk">
+								<label for="Bottom">Static Walk</label>
+							</div>		
 							
-					<div class="row justify-content-around">
-						<div class="col-12">
 							<div>
-								<input type="radio" id="FrontRightPaw" name="animation" value="FrontRightPaw">
-								<label for="FrontRightPaw">Front Right Paw</label>
-							</div>	
+								<input type="radio" id="normalWalk" name="anim" value="normalWalk">
+								<label for="Back">Normal Walk</label>
+							</div>		
+							
+							<div>
+								<input type="radio" id="dachshund" name="anim" value="dachshund">
+								<label for="Back">Dachshund</label>
+							</div>		
 
 							<div>
-								<input type="radio" id="Tail" name="animation" value="Tail">
-								<label for="Tail">Tail</label>
-							</div>	
+								<input type="radio" id="cartoon" name="anim" value="cartoon">
+								<label for="Back">Cartoon</label>
+							</div>
 						</div>
-					</div>			
+					</div>
 
-					<div class="row justify-content-center">
-						<button class="btn btn-secondary mt-2 mr-5" onclick="startAnim()">Start</button>
-						<button class="btn btn-secondary mt-2 ml-4" onclick="stopAnim()">Stop</button>
+					<div class="row justify-content-center mt-4">
+						<button class="btn btn-secondary mr-5" onclick="startAnim()">Start</button>
+						<button class="btn btn-secondary ml-4" onclick="stopAnim()">Stop</button>
 					</div>
 				</div>
 			</div>
