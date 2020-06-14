@@ -4,4 +4,6 @@ Version_2/gl-matrix-min.js
 Version_2/webgl-debug.js
 Version_3/gl-matrix-min.js
 Version_3/webgl-debug.js
+Version_4/gl-matrix-min.js
+Version_4/webgl-debug.js
 .gitignore
