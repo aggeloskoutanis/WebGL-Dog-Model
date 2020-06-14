@@ -6,7 +6,7 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<!-- Create and Initialize vertex shader -->
 		<script id="vShader" type="x-shader/x-vertex">
-			// Inputs of vertex shared
+			// Inputs of vertex shader
 			attribute vec4 aVertexPosition; // Input position
 			attribute vec4 aVertexColor; // Input color
 			attribute vec2 aTextureCoordinates; // Input texture
@@ -63,10 +63,19 @@
 			var requestId = 0; 
 			var totalCamRot = 0;
 			var totalHeight = 15;
+			var camDistance = 10;
 			var bodyTexture;
 			var skyTexture;
 			var floorVBuffer;
 			var floorIBuffer;
+			var mouseDown = false; // flag ότι κουμπί του ποντικιού είναι πατημένο
+			var deltaFresh = false; // όταν κρατάμε πατημένο το κουμπί στο animation, το deltaX, deltaY χρησιμοποιούνται επανειλημένα // αυτό το flag θα το εμποδίζει αυτό
+			var lastMouseX = null; // Τελευταία καταγεγεραμμένη θέση ποντικιού στον καμβά
+			var lastMouseY = null; 
+			var currMouseX = null; // Τρέχουσα θέση ποντικιού στον καμβά
+			var currMouseY = null;
+			var deltaMouseX = 0; // Διαφορά τρέχουσας - τελευταίας καταγεγραμμένης θέσης
+			var deltaMouseY = 0;
 
 			function loadImageForTexture(url, textureObject) {
 				// 	Create a new image object
@@ -181,7 +190,6 @@
 			// Creates the buffers for the shapes to de drawn
 			function setupBuffers() 
 			{
-
 				// Create the vertex buffer for the box element
 				vertexBuffer = gl.createBuffer(); 
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer); 
@@ -268,12 +276,11 @@
 				indexBuffer.itemSize=1; 
 				indexBuffer.numberOfItems = 36;
 
-				// Floor vertex buffer
-				// Create the vertex buffer for the box element
+				// Create the vertex buffer for the floor element
 				floorVBuffer = gl.createBuffer(); 
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorVBuffer); 
 
-				// Setup the vertices for the corners of the box
+				// Setup the vertices for the four corners of the square
 				var floorVertices = 
 				[
 					-12.5, -12.5, 0.0, 1.0,
@@ -287,12 +294,11 @@
 				floorVBuffer.itemSize = 4; 
 				floorVBuffer.numberOfItems = 4; 
 
-				// Floor index buffer
-
+				// Create the buffer for the triangles
 				floorIBuffer = gl.createBuffer(); 
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,floorIBuffer); 
 
-				// Setup the buffer with the 12 triangles needed (2 for each side)
+				// Setup the buffer with the 2 triangles needed (1 square)
 				var floorIndexMatrix = 
 				[
 					0, 1, 2,
@@ -307,10 +313,12 @@
 				// Create the texture buffer
 				textureBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
+
+				// Each face of the cube get the whole image as a texture
 				var textureCoordinates=[
 					// Back
-					0, 0,
-					0, 1.0,
+					0.0, 0.0,
+					0.0, 1.0,
 					1.0, 0.0,
 					1.0, 1.0,
 
@@ -351,6 +359,8 @@
 				// Create the texture buffer for the head
 				headTextureBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, headTextureBuffer);
+				
+				// The faces get the right portion of the texture image
 				var headTextureCoordinates=[
 					// Back
 					0.0, 1.0,
@@ -387,8 +397,6 @@
 					1.0, 1.0,
 					0.5, 0.5,
 					0.5, 1.0
-					
-					
 				];
 				gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(headTextureCoordinates),gl.STATIC_DRAW);  
 				headTextureBuffer.itemSize = 2;
@@ -433,15 +441,27 @@
 			{	
 				// Get the user inputs
 				var camAngle = parseFloat(document.getElementById('cAngle').value);
-				var camDistance = parseFloat(document.getElementById('cDistance').value);
 				var camRot = parseFloat(document.getElementById('rAngle').value);
 				var camHeight = parseFloat(document.getElementById('cHeight').value);
 
 				// Calculate the camera angle from degrees to rad and prevent overflow
 				camAngle = (camAngle%360)*Math.PI/180.0;
-				
-				// Calculate the camera rotation from degrees to rad and prevent overflow
-				camRot = camRot*Math.PI/180.0;
+
+				// Calculate the camera rotation from degrees to rad
+				// camRot = camRot*Math.PI/180.0;
+
+				// If mouse is clicked
+				if(mouseDown && deltaFresh)
+				{
+					camRot=-deltaMouseX/10000;
+					camHeight=deltaMouseY/1000;
+					deltaFresh = false;
+				}
+				else 
+				{
+					camRot=camRot*Math.PI/180.0;;
+					camHeight=camHeight;
+				}
 				
 				// Calculate the total camera rotation
 				totalCamRot = (totalCamRot + camRot)%(2*Math.PI);
@@ -483,13 +503,13 @@
 				var ScaleMatrix = mat4.create();
 				var TrSc = mat4.create();
 
-				// Push the buffers to the vertex shader
+				// Push the buffers for the floor to the vertex shader
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorVBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, floorVBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,floorIBuffer); 
 
-				// Activate a texture
+				// Activate the floor texture
 				gl.activeTexture(gl.TEXTURE0);	
 
 				// Bind texture pointer with the loaded texture
@@ -498,18 +518,18 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorTextureBuffer);
 				gl.vertexAttribPointer(textureCoordinatesAttributePointer, floorTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-				// floor
+				// Create the floor
 				var tmp = mat4.create();
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(tmp)); 
 				gl.drawElements(gl.TRIANGLES,floorIBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
-				// Push the buffers to the vertex shader
+				// Push the box buffers to the vertex shader
 				gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 				gl.vertexAttribPointer(vertexPositionAttributePointer, vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				
 				gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,indexBuffer); 
 				
-				// Activate a texture
+				// Activate the skybox texture
 				gl.activeTexture(gl.TEXTURE1);
 
 				// Bind texture pointer with the loaded texture
@@ -518,7 +538,7 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
 				gl.vertexAttribPointer(textureCoordinatesAttributePointer, textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-				// Skybox
+				// Create the skybox
 				mat4.fromTranslation(TranslationMatrix, [0, 0, 0]);
 				mat4.fromScaling(ScaleMatrix, [2500, 2500, 2500])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
@@ -526,8 +546,7 @@
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
-
-				// Activate a texture
+				// Activate the body texture
 				gl.activeTexture(gl.TEXTURE2);
 
 				// Bind texture pointer with the loaded texture
@@ -536,6 +555,7 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
 				gl.vertexAttribPointer(textureCoordinatesAttributePointer, textureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 				
+				// Create the body parts
 				// Body
 				mat4.fromTranslation(TranslationMatrix, [-1, 0, 7.5]);
 				mat4.fromScaling(ScaleMatrix, [7, 3, 2.5])
@@ -640,8 +660,7 @@
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
-
-				// Activate a texture
+				// Activate the texture for the head
 				gl.activeTexture(gl.TEXTURE3);
 
 				// Bind texture pointer with the loaded texture
@@ -650,7 +669,7 @@
 				gl.bindBuffer(gl.ARRAY_BUFFER, headTextureBuffer);
 				gl.vertexAttribPointer(textureCoordinatesAttributePointer, headTextureBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-				// Head
+				// Create the head
 				mat4.fromTranslation(TranslationMatrix, [6, 0, 15]);
 				mat4.fromScaling(ScaleMatrix, [4, 3, 2])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
@@ -691,9 +710,90 @@
 				// Clear WebGL context 
 				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT); 	
 
+				// Set actions for mouse control
+				canvas.onwheel = handleMouseWheel;
+				canvas.onmousedown = handleMouseDown;
+				window.onmouseup = handleMouseUp;
+				canvas.onmousemove = handleMouseMove;
+
+				// Get the rectangle of the canvas to get its location in the window
+				rect = canvas.getBoundingClientRect();
+
 				// Draw the first scene
 				startAnim(); 
 			}
+
+			function handleMouseWheel(event) 
+			{
+				// Change camera distance accordingly
+				if (event.deltaY > 0 && camDistance <= 10000)
+					camDistance = camDistance*1.03;
+				else if(event.deltaY < 0 && camDistance >= 0.001)
+					camDistance = camDistance*0.97;
+
+				// Redraw frame
+				if(!requestId) 
+					redraw();
+			}
+
+
+			function handleMouseMove(event) 
+			{
+				// Calculate current mouse position in the canvas
+				currMouseX = event.clientX - rect.left;
+				currMouseY = rect.bottom - event.clientY;
+
+				// Calculate mouse movement while clicked 
+				if (mouseDown)
+				{
+					if(currMouseX != lastMouseX || currMouseY != lastMouseY)
+					{
+						deltaMouseX = currMouseX - lastMouseX;
+						deltaMouseY = currMouseY - lastMouseY;
+						console.log(deltaMouseX, deltaMouseY)
+					}
+					else
+					{
+						deltaMouseX = lastMouseX;
+						deltaMouseY = lastMouseY;
+					}
+			
+					deltaFresh = true;
+				}
+
+				// // ΝΕΟ.5. ΠΡΟΒΛΗΜΑ: Οι κινήσεις του ποντικιού με πατημένο κουμπί δεν έχουν επίδραση όταν το 
+				// //			animation είναι σταματημένο. Γιατί;;;
+				// // TODO.5. Προσθέστε εδώ τις κατάλληλες εντολές ώστε οι κινήσεις του ποντικιού 
+				// //			με κουμπί πατημένο να έχουν επίδραση στη σκηνή και 
+				// //			όταν το animation είναι σταματημένο
+				
+				// // Τέλος TODO.5.
+				// lastMouseX = currMouseX;
+				// lastMouseY = currMouseY;
+			}	
+
+			function handleMouseDown(event) 
+			{
+				// Register mouse click 
+				mouseDown = true;
+
+				// Keep the last position of the mouse when not clicked
+				lastMouseX = event.clientX - rect.left;
+				lastMouseY = rect.bottom - event.clientY;
+
+				// Set mouse distances to 0 
+				deltaMouseX = 0;
+				deltaMouseY = 0;
+
+				deltaFresh = true;
+			}
+
+			function handleMouseUp(event)
+			{
+				mouseDown = false;
+			}
+
+
 
 			function startAnim() 
 			{
