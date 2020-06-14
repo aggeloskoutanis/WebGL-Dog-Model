@@ -87,6 +87,14 @@
 			var tailAnimStep = 0.05;
 			var tailAnimDirection = 1;
 
+			var FLPAnimZ = 0;
+			var FLPAnimStep = 0.05;
+			var FLPAnimDirection = 1;
+
+			var FRPAnimZ = 0;
+			var FRPAnimStep = 0.05;
+			var FRPAnimDirection = 1;
+
 			function loadImageForTexture(url, textureObject) {
 				// 	Create a new image object
 				var image = new Image();
@@ -604,6 +612,9 @@
 				mat4.fromScaling(ScaleMatrix, [2.5, 1.5, 1])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the left leg
+				TrSc = FLPAnimation(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -611,6 +622,9 @@
 				mat4.fromTranslation(TranslationMatrix, [5.5, -4.5, 1]);
 				mat4.fromScaling(ScaleMatrix, [2.5, 1.5, 1])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
+
+				// Apply the animation for the right leg
+				TrSc = FRPAnimation(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -636,6 +650,9 @@
 				mat4.fromScaling(ScaleMatrix, [1.5, 1.5, 3])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the left leg
+				TrSc = FLPAnimation(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -643,6 +660,9 @@
 				mat4.fromTranslation(TranslationMatrix, [4.5, -4.5, 5]);
 				mat4.fromScaling(ScaleMatrix, [1.5, 1.5, 3])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
+
+				// Apply the animation for the left leg
+				TrSc = FRPAnimation(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -652,7 +672,7 @@
 				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
-				// Apply the animation for the head
+				// Apply the animation for the tail
 				TrSc = tailAnimation(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
@@ -750,7 +770,7 @@
 			{
 				var isHead = document.getElementById('Head').checked;
 				var isFLPaw = document.getElementById('FrontLeftPaw').checked;
-				var isFRPaw = document.getElementById('FrontLeftPaw').checked;
+				var isFRPaw = document.getElementById('FrontRightPaw').checked;
 				var isTail = document.getElementById('Tail').checked;
 
 				if(isHead)
@@ -771,6 +791,24 @@
 					// Calculate new rotation angle
 					tailAnimZ = tailAnimZ + tailAnimDirection * tailAnimStep;
 				}
+				else if(isFLPaw)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(FLPAnimZ + FLPAnimDirection * FLPAnimStep <= -Math.PI/2 || FLPAnimZ + FLPAnimDirection * FLPAnimStep > 0)
+						FLPAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					FLPAnimZ = FLPAnimZ + FLPAnimDirection * FLPAnimStep;
+				}
+				else if(isFRPaw)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(FRPAnimZ + FRPAnimDirection * FRPAnimStep <= -Math.PI/2 || FRPAnimZ + FRPAnimDirection * FRPAnimStep > 0)
+						FRPAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					FRPAnimZ = FRPAnimZ + FRPAnimDirection * FRPAnimStep;
+				}
 				else
 				{
 					// Change camera distance accordingly
@@ -779,7 +817,7 @@
 					else if(event.deltaY < 0 && camDistance >= 0.001)
 						camDistance = camDistance*0.97;
 				}
-								
+					
 				// Redraw frame
 				if(!requestId) 
 					redraw();
@@ -832,16 +870,56 @@
 				var tmp = mat4.create();
 
 				// Translate the part to the right position 
-				mat4.fromTranslation(tmp, [-2, 0, 0])
+				mat4.fromTranslation(tmp, [-4, 0, 0])
 				mat4.multiply(part, tmp, part)
 
 				// Calculate Rotation for the animation  and rotate the part
 				mat4.fromRotation(HeadAnimRotationMatrix, headAnimZ, [0, 0, 1]);
 				mat4.multiply(part, HeadAnimRotationMatrix, part)
 
-				// // Translate part to iniital position
-				// mat4.fromTranslation(tmp, [2, 0, 0])
-				// mat4.multiply(part, tmp, part)
+				// Translate part to iniital position
+				mat4.fromTranslation(tmp, [4, 0, 0])
+				mat4.multiply(part, tmp, part)
+
+				return part;
+			}
+
+			function FLPAnimation(part)
+			{
+				var FLPAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+
+				// Translate the part to the right position 
+				mat4.fromTranslation(tmp, [-5.5, 0, -6.5])
+				mat4.multiply(part, tmp, part)
+
+				// Calculate Rotation for the animation  and rotate the part
+				mat4.fromRotation(FLPAnimRotationMatrix, FLPAnimZ, [0, 1, 0]);
+				mat4.multiply(part, FLPAnimRotationMatrix, part)
+
+				// Translate part to iniital position
+				mat4.fromTranslation(tmp, [5.5, 0, 6.5])
+				mat4.multiply(part, tmp, part)
+
+				return part;
+			}
+
+			function FRPAnimation(part)
+			{
+				var FRPAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+
+				// Translate the part to the right position 
+				mat4.fromTranslation(tmp, [-5.5, 0, -6.5])
+				mat4.multiply(part, tmp, part)
+
+				// Calculate Rotation for the animation  and rotate the part
+				mat4.fromRotation(FRPAnimRotationMatrix, FRPAnimZ, [0, 1, 0]);
+				mat4.multiply(part, FRPAnimRotationMatrix, part)
+
+				// Translate part to iniital position
+				mat4.fromTranslation(tmp, [5.5, 0, 6.5])
+				mat4.multiply(part, tmp, part)
 
 				return part;
 			}
@@ -852,16 +930,16 @@
 				var tmp = mat4.create();
 
 				// Translate the part to the right position 
-				mat4.fromTranslation(tmp, [0, 0, 1.5])
+				mat4.fromTranslation(tmp, [0, 0, -9])
 				mat4.multiply(part, tmp, part)
 
 				// Calculate Rotation for the animation  and rotate the part
 				mat4.fromRotation(tailAnimRotationMatrix, tailAnimZ, [1, 0, 0]);
 				mat4.multiply(part, tailAnimRotationMatrix, part)
 
-				// // Translate part to iniital position
-				// mat4.fromTranslation(tmp, [0, 0, 1.5])
-				// mat4.multiply(part, tmp, part)
+				// Translate part to iniital position
+				mat4.fromTranslation(tmp, [0, 0, 9])
+				mat4.multiply(part, tmp, part)
 
 				return part;
 			}
