@@ -78,7 +78,14 @@
 			var deltaMouseY = 0;
 			var mouseSensitivityX = 1/5000;
 			var mouseSensitivityY = 1/500;
+
 			var headAnimZ = 0;
+			var headAnimStep = 0.05;
+			var headAnimDirection = 1;
+
+			var tailAnimZ = 0;
+			var tailAnimStep = 0.05;
+			var tailAnimDirection = 1;
 
 			function loadImageForTexture(url, textureObject) {
 				// 	Create a new image object
@@ -464,6 +471,7 @@
 					camRot=0;
 					camHeight=0;
 				}
+
 				
 				// Calculate the total camera rotation
 				totalCamRot = (totalCamRot + camRot)%(2*Math.PI);
@@ -504,7 +512,7 @@
 				var TranslationMatrix = mat4.create();
 				var ScaleMatrix = mat4.create();
 				var TrSc = mat4.create();
-				var RotationMatrix = mat4.create();
+				
 
 				// Push the buffers for the floor to the vertex shader
 				gl.bindBuffer(gl.ARRAY_BUFFER, floorVBuffer);
@@ -644,6 +652,9 @@
 				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the head
+				TrSc = tailAnimation(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 				
@@ -652,6 +663,9 @@
 				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
+				// Apply the animation for the head
+				TrSc = headAnimation(TrSc);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -659,6 +673,9 @@
 				mat4.fromTranslation(TranslationMatrix, [3, -4, 14.5]);
 				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
+
+				// Apply the animation for the head
+				TrSc = headAnimation(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -677,8 +694,8 @@
 				mat4.fromScaling(ScaleMatrix, [4, 3, 2])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
-				mat4.fromRotation(RotationMatrix, Math.PI/2, [0, 0, 1]);
-				mat4.multiply(TrSc, RotationMatrix, TrSc)
+				// Apply the animation for the head
+				TrSc = headAnimation(TrSc);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -731,12 +748,38 @@
 
 			function handleMouseWheel(event) 
 			{
-				// Change camera distance accordingly
-				if (event.deltaY > 0 && camDistance <= 10000)
-					camDistance = camDistance*1.03;
-				else if(event.deltaY < 0 && camDistance >= 0.001)
-					camDistance = camDistance*0.97;
+				var isHead = document.getElementById('Head').checked;
+				var isFLPaw = document.getElementById('FrontLeftPaw').checked;
+				var isFRPaw = document.getElementById('FrontLeftPaw').checked;
+				var isTail = document.getElementById('Tail').checked;
 
+				if(isHead)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(headAnimZ + headAnimDirection * headAnimStep) >= Math.PI/2)
+						headAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					headAnimZ = headAnimZ + headAnimDirection * headAnimStep;
+				}
+				else if(isTail)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(tailAnimZ + tailAnimDirection * tailAnimStep) >= Math.PI/2)
+						tailAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					tailAnimZ = tailAnimZ + tailAnimDirection * tailAnimStep;
+				}
+				else
+				{
+					// Change camera distance accordingly
+					if (event.deltaY > 0 && camDistance <= 10000)
+						camDistance = camDistance*1.03;
+					else if(event.deltaY < 0 && camDistance >= 0.001)
+						camDistance = camDistance*0.97;
+				}
+								
 				// Redraw frame
 				if(!requestId) 
 					redraw();
@@ -783,9 +826,44 @@
 				deltaFresh = true;
 			}
 
-			function headAnimation()
+			function headAnimation(part)
 			{
+				var HeadAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
 
+				// Translate the part to the right position 
+				mat4.fromTranslation(tmp, [-2, 0, 0])
+				mat4.multiply(part, tmp, part)
+
+				// Calculate Rotation for the animation  and rotate the part
+				mat4.fromRotation(HeadAnimRotationMatrix, headAnimZ, [0, 0, 1]);
+				mat4.multiply(part, HeadAnimRotationMatrix, part)
+
+				// // Translate part to iniital position
+				// mat4.fromTranslation(tmp, [2, 0, 0])
+				// mat4.multiply(part, tmp, part)
+
+				return part;
+			}
+
+			function tailAnimation(part)
+			{
+				var tailAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+
+				// Translate the part to the right position 
+				mat4.fromTranslation(tmp, [0, 0, 1.5])
+				mat4.multiply(part, tmp, part)
+
+				// Calculate Rotation for the animation  and rotate the part
+				mat4.fromRotation(tailAnimRotationMatrix, tailAnimZ, [1, 0, 0]);
+				mat4.multiply(part, tailAnimRotationMatrix, part)
+
+				// // Translate part to iniital position
+				// mat4.fromTranslation(tmp, [0, 0, 1.5])
+				// mat4.multiply(part, tmp, part)
+
+				return part;
 			}
 
 
