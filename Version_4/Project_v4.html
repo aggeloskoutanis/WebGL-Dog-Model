@@ -103,6 +103,27 @@
 			var staticWalkAnimStep = 0.05;
 			var staticWalkAnimDirection = 1;
 
+			var normalWalkAnimY = 0;
+			var normalWalkAnimStep = 0.05;
+			var normalWalkAnimDirection = 1;
+
+			var dachsHundAnimLength = 14;
+			var dachsHundAnimStep = 0.05;
+			var dachsHundAnimDirection = 1;
+			var dachsHundAnimScale = 1;
+
+			var cartoonAnimPawStep = 0.03;
+			var cartoonAnimPawScale = 1;
+			var cartoonAnimPawLength = 5;
+			var cartoonAnimPawDirection = 1;
+			var cartoonAnimTailAngle = 0;
+			var cartoonAnimTailStep = 0.1;
+			var cartoonNeckLength = 3;
+			var cartoonAnimNeckDirection = 1;
+			var cartoonNeckStep = 0.05;
+			var cartoonNeckScale = 1;
+
+
 			function loadImageForTexture(url, textureObject) {
 				// 	Create a new image object
 				var image = new Image();
@@ -591,6 +612,12 @@
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
 
+				// Apply the animation for the normal walk animation
+				TrSc = normalWalk(TrSc, true,  1, true);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, false, true);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -601,6 +628,15 @@
 
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  1, true);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, false, 0, 0, true, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -613,8 +649,17 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, false, -1);
 
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, false, -1, false);
+				
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, false, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, true, -5.5, 4.5, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);	
@@ -627,8 +672,17 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, false, 1);
 
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, false,  1, false);
+
 				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, false, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, true, -5.5, -4.5, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -641,11 +695,20 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, true, 1);
 
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  1, false);
+
 				// Apply the animation for the left leg
 				TrSc = FLPAnimation(TrSc);
 
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, true, 5.5, 4.5, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -661,8 +724,16 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, true, -1);
 
-				// Apply the animation	 for the play dead animation
+				TrSc = normalWalk(TrSc, true, -1, false);
+
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, true, 5.5, -4.5, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -675,8 +746,14 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, false, -1);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, false,  -1, false);
+
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);	
@@ -689,8 +766,14 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, false, 1);
 
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, false,  1, false);
+
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -706,8 +789,14 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, true, 1);
 
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  1, false);
+
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);				
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -723,8 +812,14 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, true, -1);
 
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  -1, false);
+
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -739,6 +834,15 @@
 
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
+				
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  1, true);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, false, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, true, false, 0, 0, false, false);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -754,6 +858,15 @@
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
 
+				// Apply the animation for the normal walk animation
+				TrSc = normalWalk(TrSc, true,  1, true);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, false, 0, 0, false, true);
+
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
 
@@ -765,8 +878,17 @@
 				// Apply the animation for the head
 				TrSc = headAnimation(TrSc);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  1, true);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, false, 0, 0, false, true);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -790,6 +912,15 @@
 
 				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
+
+				// Apply the animation for the normal; walk animation
+				TrSc = normalWalk(TrSc, true,  1, true);
+
+				// Apply the animation for the dachsHund animation
+				TrSc = dachsHund(TrSc, true, false);
+
+				// Apply the animation for the cartoon animation
+				TrSc = cartoon(TrSc, false, false, 0, 0, false, true);
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
@@ -921,7 +1052,50 @@
 					// Calculate new rotation angles
 					staticWalkAnimY = staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep;
 				}
+				if(isNormalWalk)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep) >= Math.PI/2)
+						normalWalkAnimDirection *= -1;
+
+					// Calculate new rotation angles
+					normalWalkAnimY = normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep;
+				}
+
+				if(isDachshund)
+				{
+					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					if(14 * dachsHundAnimScale > 28 || 14 * dachsHundAnimScale < 14)
+						dachsHundAnimDirection *= -1;
+
 					
+					// Calculate new animation scale
+					dachsHundAnimScale = dachsHundAnimScale + dachsHundAnimDirection*dachsHundAnimStep;
+					dachsHundAnimLength = 14 * dachsHundAnimScale;
+				}
+					
+				if(isCartoon)
+				{
+					// Calculate the angle for the tail rotation 
+					cartoonAnimTailAngle = (cartoonAnimTailAngle + cartoonAnimTailStep) % (Math.PI * 2);
+
+					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					if(5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep > 8 || 5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep < 5)
+						cartoonAnimPawDirection *= -1;
+
+					// Calculate new animation scale
+					cartoonAnimPawScale = cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep;
+					cartoonAnimPawLength = 5 * cartoonAnimPawScale;
+
+					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					if(3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep > 6 || 3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep < 3)
+						cartoonAnimNeckDirection *= -1;
+
+					// Calculate new animation scale
+					cartoonNeckScale = cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep;
+					cartoonNeckLength = 3 * cartoonNeckScale;
+				}
+
 				// Redraw frame
 				if(!requestId) 
 					redraw();
@@ -1076,7 +1250,7 @@
 				if(isfront)
 				{
 					// Translate the part to the right position 
-					mat4.fromTranslation(tmp, [-5.5, 0, -6.5])
+					mat4.fromTranslation(tmp, [-4.5, 0, -6.5])
 					mat4.multiply(part, tmp, part)
 
 					// Calculate Rotation for the animation  and rotate the part
@@ -1084,13 +1258,13 @@
 					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
 
 					// Translate part to iniital position
-					mat4.fromTranslation(tmp, [5.5, 0, 6.5])
+					mat4.fromTranslation(tmp, [4.5, 0, 6.5])
 					mat4.multiply(part, tmp, part)
 				}
 				else
 				{
 					// Translate the part to the right position 
-					mat4.fromTranslation(tmp, [5.5, 0, -6.5])
+					mat4.fromTranslation(tmp, [6.5, 0, -6.5])
 					mat4.multiply(part, tmp, part)
 
 					// Calculate Rotation for the animation  and rotate the part
@@ -1098,12 +1272,137 @@
 					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
 
 					// Translate part to iniital position
-					mat4.fromTranslation(tmp, [-5.5, 0, 6.5])
+					mat4.fromTranslation(tmp, [-6.5, 0, 6.5])
 					mat4.multiply(part, tmp, part)
 				}
 				return part;
 			}
 
+			function normalWalk(part, isFront, direction, isBody)
+			{
+				var normalWalkAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+
+				if(isFront && !isBody)
+				{
+					// Translate the part to the right position 
+					mat4.fromTranslation(tmp, [-4.5, 0, -6.5]);
+					mat4.multiply(part, tmp, part);
+
+					// Calculate Rotation for the animation  and rotate the part
+					mat4.fromRotation(normalWalkAnimRotationMatrix, direction*normalWalkAnimY, [0, 1, 0]);
+					mat4.multiply(part, normalWalkAnimRotationMatrix, part);
+
+					// Translate part to iniital position
+					mat4.fromTranslation(tmp, [4.5+3*normalWalkAnimY, 0, 6.5]);
+					mat4.multiply(part, tmp, part);
+				}
+				else if (!isFront && !isBody)
+				{
+					// Translate the part to the right position 
+					mat4.fromTranslation(tmp, [6.5, 0, -6.5]);
+					mat4.multiply(part, tmp, part);
+
+					// Calculate Rotation for the animation  and rotate the part
+					mat4.fromRotation(normalWalkAnimRotationMatrix, direction*normalWalkAnimY, [0, 1, 0]);
+					mat4.multiply(part, normalWalkAnimRotationMatrix, part)
+
+					// Translate part to iniital position
+					mat4.fromTranslation(tmp, [-6.5+3*normalWalkAnimY, 0, 6.5]);
+					mat4.multiply(part, tmp, part)
+				}
+				else
+				{					
+					// Translate part to iniital position
+					mat4.fromTranslation(tmp, [3*normalWalkAnimY, 0, 0]);
+					mat4.multiply(part, tmp, part)
+				}
+
+				return part;
+			}
+
+			function dachsHund(part, isFront, isBody)
+			{
+				var tmp = mat4.create();
+				var tmp2 = mat4.create();
+
+				if(isBody)
+				{
+					mat4.fromTranslation(tmp2, [1, 0, 0])
+					mat4.multiply(part, tmp2, part);
+					mat4.fromScaling(tmp, [dachsHundAnimScale, 1, 1]);
+					mat4.multiply(part, tmp, part);
+					mat4.fromTranslation(tmp2, [-1, 0, 0])
+					mat4.multiply(part, tmp2, part);
+					return part;
+				}
+
+				if(isFront)
+				{
+					mat4.fromTranslation(tmp, [dachsHundAnimLength/2 - 7 , 0, 0])
+					mat4.multiply(part, tmp, part);
+				}
+				else
+				{
+					mat4.fromTranslation(tmp, [-(dachsHundAnimLength/2 - 7) , 0, 0])
+					mat4.multiply(part, tmp, part);
+				}
+				return part;
+			}
+
+			function cartoon(part, isTail, isPaw, pawX, pawY, isNeck, isHead)
+			{
+				var tailAnimRotationMatrix = mat4.create();
+				var tmp = mat4.create();
+				var tmp2 = mat4.create();
+
+				if(isTail)
+				{
+					// Translate the part to the right position 
+					mat4.fromTranslation(tmp, [0, 0, -9])
+					mat4.multiply(part, tmp, part)
+
+					// Calculate Rotation for the animation  and rotate the part
+					mat4.fromRotation(tailAnimRotationMatrix, cartoonAnimTailAngle, [1, 0, 0]);
+					mat4.multiply(part, tailAnimRotationMatrix, part)
+
+					// Translate part to iniital position
+					mat4.fromTranslation(tmp, [0, 0, 9])
+					mat4.multiply(part, tmp, part)
+					return part;
+				}
+
+				if(isPaw)
+				{
+					mat4.fromTranslation(tmp2, [-pawX, -pawY, 0])
+					mat4.multiply(part, tmp2, part);
+					mat4.fromScaling(tmp, [cartoonAnimPawScale, cartoonAnimPawScale, 1]);
+					mat4.multiply(part, tmp, part);
+					mat4.fromTranslation(tmp2, [pawX, pawY, 0])
+					mat4.multiply(part, tmp2, part);
+					return part;
+				}
+
+				if(isNeck)
+				{
+					mat4.fromTranslation(tmp2, [9, 0, -11.5])
+					mat4.multiply(part, tmp2, part);
+					mat4.fromScaling(tmp, [1, 1, cartoonNeckScale]);
+					mat4.multiply(part, tmp, part);
+					mat4.fromTranslation(tmp2, [-9, 0, 10 + cartoonNeckLength/2])
+					mat4.multiply(part, tmp2, part);
+					return part;
+				}
+
+				if(isHead)
+				{
+					mat4.fromTranslation(tmp, [0 , 0, -3 + cartoonNeckLength])
+					mat4.multiply(part, tmp, part);
+				}
+
+		
+				return part;
+			}
 
 			function handleMouseUp(event)
 			{
@@ -1183,7 +1482,7 @@
 					</div>
 
 					<div class="row justify-content-center mt-1">
-						<div class="col-4">
+						<div class="col-2">
 							<div>
 								<input type="radio" id="playDead" name="anim" value="playDead">
 								<label for="Left">Play Dead</label>
