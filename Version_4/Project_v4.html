@@ -76,53 +76,53 @@
 			var currMouseY = null;
 			var deltaMouseX = 0; // Diffence between current and last mouse position 
 			var deltaMouseY = 0;
-			var mouseSensitivityX = 1/5000;
+			var mouseSensitivityX = 1/5000; 
 			var mouseSensitivityY = 1/500;
 			var mainAnimation = false;
 
-			var headAnimZ = 0;
-			var headAnimStep = 0.05;
-			var headAnimDirection = 1;
+			var headAnimZ = 0; // Rotation angle
+			var headAnimStep = 0.05; // Rotation angle step
+			var headAnimDirection = 1; // Rotation Direction
 
-			var tailAnimX = 0;
-			var tailAnimStep = 0.05;
-			var tailAnimDirection = 1;
+			var tailAnimX = 0; // Rotation angle
+			var tailAnimStep = 0.05; // Rotation angle step
+			var tailAnimDirection = 1; // Rotation Direction
 
-			var FLPAnimY = 0;
-			var FLPAnimStep = 0.05;
-			var FLPAnimDirection = 1;
+			var FLPAnimY = 0; // Rotation angle
+			var FLPAnimStep = 0.05; // Rotation angle step
+			var FLPAnimDirection = 1; // Rotation Direction
 
-			var FRPAnimY = 0;
-			var FRPAnimStep = 0.05;
-			var FRPAnimDirection = 1;
+			var FRPAnimY = 0; // Rotation angle
+			var FRPAnimStep = 0.05; // Rotation angle step
+			var FRPAnimDirection = 1; // Rotation Direction
 
-			var playDeadAnimX = 0;
-			var playDeadAnimStep = 0.05;
-			var playDeadAnimDirection = 1;
+			var playDeadAnimX = 0; // Rotation angle
+			var playDeadAnimStep = 0.05; // Rotation angle step
+			var playDeadAnimDirection = 1; // Rotation Direction
 
-			var staticWalkAnimY = 0;
-			var staticWalkAnimStep = 0.05;
-			var staticWalkAnimDirection = 1;
+			var staticWalkAnimY = 0; // Rotation angle
+			var staticWalkAnimStep = 0.05; // Rotation angle step
+			var staticWalkAnimDirection = 1; // Rotation Direction
 
-			var normalWalkAnimY = 0;
-			var normalWalkAnimStep = 0.05;
-			var normalWalkAnimDirection = 1;
+			var normalWalkAnimY = 0; // Rotation angle
+			var normalWalkAnimStep = 0.05; // Rotation angle step
+			var normalWalkAnimDirection = 1; // Rotation Direction
 
-			var dachsHundAnimLength = 14;
-			var dachsHundAnimStep = 0.05;
-			var dachsHundAnimDirection = 1;
-			var dachsHundAnimScale = 1;
+			var dachsHundAnimLength = 14; // Body length 
+			var dachsHundAnimStep = 0.05; // Body stretch step
+			var dachsHundAnimDirection = 1; // Body stretch direction
+			var dachsHundAnimScale = 1; // Body scale
 
-			var cartoonAnimPawStep = 0.03;
-			var cartoonAnimPawScale = 1;
-			var cartoonAnimPawLength = 5;
-			var cartoonAnimPawDirection = 1;
-			var cartoonAnimTailAngle = 0;
-			var cartoonAnimTailStep = 0.1;
-			var cartoonNeckLength = 3;
-			var cartoonAnimNeckDirection = 1;
-			var cartoonNeckStep = 0.05;
-			var cartoonNeckScale = 1;
+			var cartoonAnimPawStep = 0.03; // Paw inflation step
+			var cartoonAnimPawScale = 1; // Paw inflation scale
+			var cartoonAnimPawLength = 5; // Paw inflation length
+			var cartoonAnimPawDirection = 1; // Paw inflation step
+			var cartoonAnimTailAngle = 0; // Tail rotation angle
+			var cartoonAnimTailStep = 0.1; // Tail rotation step
+			var cartoonNeckLength = 3; // Neck length
+			var cartoonAnimNeckDirection = 1; // Neck direction
+			var cartoonNeckStep = 0.05; // Neck step
+			var cartoonNeckScale = 1; // Neck scale
 
 
 			function loadImageForTexture(url, textureObject) {
@@ -974,6 +974,7 @@
 			function handleMouseWheel(event) 
 			{
 				var isCamera = document.getElementById('cHeight').checked;
+				var isNone = document.getElementById('none').checked;
 				
 				if(isCamera)
 				{
@@ -984,7 +985,8 @@
 						camDistance = camDistance*0.97;
 				}
 
-				handleSimpleAnimations();
+				if(isNone)
+					handleSimpleAnimations();
 
 				if(!mainAnimation)
 					handleMainAnimations();
@@ -1104,7 +1106,7 @@
 				mat4.fromTranslation(tmp, [0, 0, -9])
 				mat4.multiply(part, tmp, part)
 
-				// Calculate Rotation for the animation  and rotate the part
+				// Calculate Rotation for the animation and rotate the part
 				mat4.fromRotation(tailAnimRotationMatrix, tailAnimX, [1, 0, 0]);
 				mat4.multiply(part, tailAnimRotationMatrix, part)
 
@@ -1150,7 +1152,7 @@
 					mat4.fromRotation(staticWalkAnimRotationMatrix, direction*staticWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
 
-					// Translate part to initial position
+					// Translate the part to initial position
 					mat4.fromTranslation(tmp, [4.5, 0, 6.5])
 					mat4.multiply(part, tmp, part)
 				}
@@ -1164,7 +1166,7 @@
 					mat4.fromRotation(staticWalkAnimRotationMatrix, direction*staticWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
 
-					// Translate part to iniital position
+					// Translate the part to iniital position
 					mat4.fromTranslation(tmp, [-6.5, 0, 6.5])
 					mat4.multiply(part, tmp, part)
 				}
@@ -1186,7 +1188,7 @@
 					mat4.fromRotation(normalWalkAnimRotationMatrix, direction*normalWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, normalWalkAnimRotationMatrix, part);
 
-					// Translate part to initial position
+					// Translate the part to initial position
 					mat4.fromTranslation(tmp, [4.5+3*normalWalkAnimY, 0, 6.5]);
 					mat4.multiply(part, tmp, part);
 				}
@@ -1200,13 +1202,13 @@
 					mat4.fromRotation(normalWalkAnimRotationMatrix, direction*normalWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, normalWalkAnimRotationMatrix, part)
 
-					// Translate part to initial position
+					// Translate the part to initial position
 					mat4.fromTranslation(tmp, [-6.5+3*normalWalkAnimY, 0, 6.5]);
 					mat4.multiply(part, tmp, part)
 				}
 				else
 				{					
-					// Translate part to initial position
+					// Translate the part to initial position
 					mat4.fromTranslation(tmp, [3*normalWalkAnimY, 0, 0]);
 					mat4.multiply(part, tmp, part)
 				}
@@ -1221,10 +1223,15 @@
 
 				if(isBody)
 				{
+					// Translate the part to the right position 
 					mat4.fromTranslation(tmp2, [1, 0, 0])
 					mat4.multiply(part, tmp2, part);
+
+					// Scale the part
 					mat4.fromScaling(tmp, [dachsHundAnimScale, 1, 1]);
 					mat4.multiply(part, tmp, part);
+
+					// Translate the part to the initial position 
 					mat4.fromTranslation(tmp2, [-1, 0, 0])
 					mat4.multiply(part, tmp2, part);
 					return part;
@@ -1232,11 +1239,13 @@
 
 				if(isFront)
 				{
+					// Translate legs to match the new body
 					mat4.fromTranslation(tmp, [dachsHundAnimLength/2 - 7 , 0, 0])
 					mat4.multiply(part, tmp, part);
 				}
 				else
 				{
+					// Translate legs to match the new body
 					mat4.fromTranslation(tmp, [-(dachsHundAnimLength/2 - 7) , 0, 0])
 					mat4.multiply(part, tmp, part);
 				}
@@ -1267,10 +1276,15 @@
 
 				if(isPaw)
 				{
+					// Translate the part to the right position 
 					mat4.fromTranslation(tmp2, [-pawX, -pawY, 0])
 					mat4.multiply(part, tmp2, part);
+
+					// Scale part
 					mat4.fromScaling(tmp, [cartoonAnimPawScale, cartoonAnimPawScale, 1]);
 					mat4.multiply(part, tmp, part);
+
+					// Translate the part to the initial position 
 					mat4.fromTranslation(tmp2, [pawX, pawY, 0])
 					mat4.multiply(part, tmp2, part);
 					return part;
@@ -1278,10 +1292,15 @@
 
 				if(isNeck)
 				{
+					// Translate the part to the right position 
 					mat4.fromTranslation(tmp2, [9, 0, -11.5])
 					mat4.multiply(part, tmp2, part);
+
+					// Scale part
 					mat4.fromScaling(tmp, [1, 1, cartoonNeckScale]);
 					mat4.multiply(part, tmp, part);
+
+					// Translate the part to the initial position 
 					mat4.fromTranslation(tmp2, [-9, 0, 10 + cartoonNeckLength/2])
 					mat4.multiply(part, tmp2, part);
 					return part;
@@ -1289,11 +1308,11 @@
 
 				if(isHead)
 				{
+					// Translate head to match the new neck
 					mat4.fromTranslation(tmp, [0 , 0, -3 + cartoonNeckLength])
 					mat4.multiply(part, tmp, part);
 				}
 
-		
 				return part;
 			}
 
@@ -1554,32 +1573,32 @@
 						<div class="col-2">
 							<div>
 								<input type="radio" id="playDead" name="anim" value="playDead" onclick="initializeAnimationVars()">
-								<label for="Left">Play Dead</label>
+								<label for="playDead">Play Dead</label>
 							</div>	
 
 							<div>
 								<input type="radio" id="staticWalk" name="anim" value="staticWalk" onclick="initializeAnimationVars()">
-								<label for="Bottom">Static Walk</label>
+								<label for="staticWalk">Static Walk</label>
 							</div>		
 							
 							<div>
 								<input type="radio" id="normalWalk" name="anim" value="normalWalk" onclick="initializeAnimationVars()">
-								<label for="Back">Normal Walk</label>
+								<label for="normalWalk">Normal Walk</label>
 							</div>		
 							
 							<div>
 								<input type="radio" id="dachshund" name="anim" value="dachshund" onclick="initializeAnimationVars()">
-								<label for="Back">Dachshund</label>
+								<label for="dachshund">Dachshund</label>
 							</div>		
 
 							<div>
 								<input type="radio" id="cartoon" name="anim" value="cartoon" onclick="initializeAnimationVars()">
-								<label for="Back">Cartoon</label>
+								<label for="cartoon">Cartoon</label>
 							</div>
 
 							<div>
 								<input type="radio" id="none" name="anim" value="none" onclick="initializeAnimationVars()">
-								<label for="Back">None</label>
+								<label for="none">None</label>
 							</div>
 						</div>
 					</div>
