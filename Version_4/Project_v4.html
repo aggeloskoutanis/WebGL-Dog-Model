@@ -47,7 +47,7 @@
 		</script>
 
 		<script>
-			// Initialize the needed variables 
+			// Declare and initialize the needed variables 
 			var gl; 
 			var canvas;
 			var shaderProgram; 
@@ -68,13 +68,13 @@
 			var skyTexture;
 			var floorVBuffer;
 			var floorIBuffer;
-			var mouseDown = false; // flag ότι κουμπί του ποντικιού είναι πατημένο
-			var deltaFresh = false; // όταν κρατάμε πατημένο το κουμπί στο animation, το deltaX, deltaY χρησιμοποιούνται επανειλημένα // αυτό το flag θα το εμποδίζει αυτό
-			var lastMouseX = null; // Τελευταία καταγεγεραμμένη θέση ποντικιού στον καμβά
+			var mouseDown = false; // Flag that indicated that mouse button is pressed
+			var deltaFresh = false; // Stop getting new Delta values while holding down animation button
+			var lastMouseX = null; // Last registered mouse position on Canvas
 			var lastMouseY = null; 
-			var currMouseX = null; // Τρέχουσα θέση ποντικιού στον καμβά
+			var currMouseX = null; // Current mouse position on Canvas
 			var currMouseY = null;
-			var deltaMouseX = 0; // Διαφορά τρέχουσας - τελευταίας καταγεγραμμένης θέσης
+			var deltaMouseX = 0; // Diffence between current and last mouse position 
 			var deltaMouseY = 0;
 			var mouseSensitivityX = 1/5000;
 			var mouseSensitivityY = 1/500;
@@ -129,7 +129,7 @@
 				// 	Create a new image object
 				var image = new Image();
 
-				// Do the below when the image loads
+				// Do the following when the image loads
 				image.onload = function() 
 				{    
 					// Activate given texture as current
@@ -227,7 +227,7 @@
 				gl.enableVertexAttribArray(vertexPositionAttributePointer); 
 				gl.enableVertexAttribArray(textureCoordinatesAttributePointer);
 				
-				// Get pointers to the tranform and perpective uniforms
+				// Get pointers to the tranform and perspective uniforms
 				transformUniformPointer = gl.getUniformLocation(shaderProgram, "uTransformMatrix"); 
 				perspectiveViewUniformPointer = gl.getUniformLocation(shaderProgram, "uPerspectiveViewMatrix");
 
@@ -362,7 +362,7 @@
 				textureBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, textureBuffer);
 
-				// Each face of the cube get the whole image as a texture
+				// Each side of the cube get the whole image as a texture
 				var textureCoordinates=[
 					// Back
 					0.0, 0.0,
@@ -408,7 +408,7 @@
 				headTextureBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, headTextureBuffer);
 				
-				// The faces get the right portion of the texture image
+				// The sides get the right portion of the texture image
 				var headTextureCoordinates=[
 					// Back
 					0.0, 1.0,
@@ -517,7 +517,7 @@
 				// Calculate the total camera height
 				totalHeight = totalHeight + camHeight;
 				 
-				// Create the view, perpective and combined matrices
+				// Create the view, perspective and combined matrices
 				var vMatrix = mat4.create();
 				var pMatrix = mat4.create();
 				var pvMatrix = mat4.create();
@@ -610,7 +610,7 @@
 				mat4.fromScaling(ScaleMatrix, [7, 3, 2.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 
 				// Apply the animation for the normal walk animation
@@ -627,10 +627,10 @@
 				mat4.fromScaling(ScaleMatrix, [2, 2, 1.5])
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 
-				// Apply the animation for the normal; walk animation
+				// Apply the animation for the normal walk animation
 				TrSc = normalWalk(TrSc, true,  1, true);
 
 				// Apply the animation for the dachsHund animation
@@ -653,7 +653,7 @@
 				// Apply the animation for the normal; walk animation
 				TrSc = normalWalk(TrSc, false, -1, false);
 				
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 
 				// Apply the animation for the dachsHund animation
@@ -696,7 +696,7 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, true, 1);
 
-				// Apply the animation for the normal; walk animation
+				// Apply the animation for the normal walk animation
 				TrSc = normalWalk(TrSc, true,  1, false);
 
 				// Apply the animation for the left leg
@@ -767,7 +767,7 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, false, 1);
 
-				// Apply the animation for the normal; walk animation
+				// Apply the animation for the normal walk animation
 				TrSc = normalWalk(TrSc, false,  1, false);
 
 				// Apply the animation	 for the play dead animation
@@ -790,10 +790,10 @@
 				// Apply the animation for the static walk animation
 				TrSc = staticWalk(TrSc, true, 1);
 
-				// Apply the animation for the normal; walk animation
+				// Apply the animation for the normal walk animation
 				TrSc = normalWalk(TrSc, true,  1, false);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 
 				// Apply the animation for the dachsHund animation
@@ -814,7 +814,7 @@
 				TrSc = staticWalk(TrSc, true, -1);
 
 				// Apply the animation for the normal; walk animation
-				TrSc = normalWalk(TrSc, true,  -1, false);
+				TrSc = normalWalk(TrSc, true, -1, false);
 
 				// Apply the animation	 for the play dead animation
 				TrSc = playDead(TrSc);
@@ -833,11 +833,11 @@
 				// Apply the animation for the tail
 				TrSc = tailAnimation(TrSc);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 				
-				// Apply the animation for the normal; walk animation
-				TrSc = normalWalk(TrSc, true,  1, true);
+				// Apply the animation for the normal walk animation
+				TrSc = normalWalk(TrSc, true, 1, true);
 
 				// Apply the animation for the dachsHund animation
 				TrSc = dachsHund(TrSc, false, false);
@@ -850,13 +850,13 @@
 				
 				// Left Ear
 				mat4.fromTranslation(TranslationMatrix, [3, 4, 14.5]);
-				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5])
+				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5]);
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
 				// Apply the animation for the head
 				TrSc = headAnimation(TrSc);
 
-				// Apply the animation	 for the play dead animation
+				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 
 				// Apply the animation for the normal walk animation
@@ -873,7 +873,7 @@
 
 				// Right Ear
 				mat4.fromTranslation(TranslationMatrix, [3, -4, 14.5]);
-				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5])
+				mat4.fromScaling(ScaleMatrix, [1, 1, 2.5]);
 				mat4.multiply(TrSc, TranslationMatrix, ScaleMatrix);
 
 				// Apply the animation for the head
@@ -882,7 +882,7 @@
 				// Apply the animation for the play dead animation
 				TrSc = playDead(TrSc);
 
-				// Apply the animation for the normal; walk animation
+				// Apply the animation for the normal walk animation
 				TrSc = normalWalk(TrSc, true,  1, true);
 
 				// Apply the animation for the dachsHund animation
@@ -925,8 +925,7 @@
 
 				gl.uniformMatrix4fv(transformUniformPointer, false, new Float32Array(TrSc)); 
 				gl.drawElements(gl.TRIANGLES,indexBuffer.numberOfItems,gl.UNSIGNED_SHORT, 0);
-				
-
+					
 			}
 
 			function startup() {
@@ -1125,11 +1124,11 @@
 				mat4.fromTranslation(tmp, [0, -6, 0])
 				mat4.multiply(part, tmp, part)
 
-				// Calculate Rotation for the animation  and rotate the part
+				// Calculate Rotation for the animation and rotate the part
 				mat4.fromRotation(tailAnimRotationMatrix, playDeadAnimX, [1, 0, 0]);
 				mat4.multiply(part, tailAnimRotationMatrix, part)
 
-				// Translate part to iniital position
+				// Translate part to initial position
 				mat4.fromTranslation(tmp, [0, 6, 0])
 				mat4.multiply(part, tmp, part)
 
@@ -1143,15 +1142,15 @@
 
 				if(isfront)
 				{
-					// Translate the part to the right position 
+					// Translate the part to the right position
 					mat4.fromTranslation(tmp, [-4.5, 0, -6.5])
 					mat4.multiply(part, tmp, part)
 
-					// Calculate Rotation for the animation  and rotate the part
+					// Calculate Rotation for the animation and rotate the part
 					mat4.fromRotation(staticWalkAnimRotationMatrix, direction*staticWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, staticWalkAnimRotationMatrix, part)
 
-					// Translate part to iniital position
+					// Translate part to initial position
 					mat4.fromTranslation(tmp, [4.5, 0, 6.5])
 					mat4.multiply(part, tmp, part)
 				}
@@ -1183,11 +1182,11 @@
 					mat4.fromTranslation(tmp, [-4.5, 0, -6.5]);
 					mat4.multiply(part, tmp, part);
 
-					// Calculate Rotation for the animation  and rotate the part
+					// Calculate Rotation for the animation and rotate the part
 					mat4.fromRotation(normalWalkAnimRotationMatrix, direction*normalWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, normalWalkAnimRotationMatrix, part);
 
-					// Translate part to iniital position
+					// Translate part to initial position
 					mat4.fromTranslation(tmp, [4.5+3*normalWalkAnimY, 0, 6.5]);
 					mat4.multiply(part, tmp, part);
 				}
@@ -1197,17 +1196,17 @@
 					mat4.fromTranslation(tmp, [6.5, 0, -6.5]);
 					mat4.multiply(part, tmp, part);
 
-					// Calculate Rotation for the animation  and rotate the part
+					// Calculate Rotation for the animation and rotate the part
 					mat4.fromRotation(normalWalkAnimRotationMatrix, direction*normalWalkAnimY, [0, 1, 0]);
 					mat4.multiply(part, normalWalkAnimRotationMatrix, part)
 
-					// Translate part to iniital position
+					// Translate part to initial position
 					mat4.fromTranslation(tmp, [-6.5+3*normalWalkAnimY, 0, 6.5]);
 					mat4.multiply(part, tmp, part)
 				}
 				else
 				{					
-					// Translate part to iniital position
+					// Translate part to initial position
 					mat4.fromTranslation(tmp, [3*normalWalkAnimY, 0, 0]);
 					mat4.multiply(part, tmp, part)
 				}
@@ -1256,11 +1255,11 @@
 					mat4.fromTranslation(tmp, [0, 0, -9])
 					mat4.multiply(part, tmp, part)
 
-					// Calculate Rotation for the animation  and rotate the part
+					// Calculate Rotation for the animation and rotate the part
 					mat4.fromRotation(tailAnimRotationMatrix, cartoonAnimTailAngle, [1, 0, 0]);
 					mat4.multiply(part, tailAnimRotationMatrix, part)
 
-					// Translate part to iniital position
+					// Translate part to initial position
 					mat4.fromTranslation(tmp, [0, 0, 9])
 					mat4.multiply(part, tmp, part)
 					return part;
@@ -1313,7 +1312,7 @@
 
 				if(isPlayDead)
 				{
-					// If the angle is going to be bigger than 90 degrees change direction
+					// If the angle is bigger than 90 degrees change direction
 					if(playDeadAnimX + playDeadAnimDirection * playDeadAnimStep <= -Math.PI/2 || playDeadAnimX + playDeadAnimDirection * playDeadAnimStep > 0)
 						playDeadAnimDirection *= -1;
 
@@ -1327,7 +1326,7 @@
 					if(Math.abs(staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep) >= Math.PI/2)
 						staticWalkAnimDirection *= -1;
 
-					// Calculate new rotation angles
+					// Calculate new rotation angle
 					staticWalkAnimY = staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep;
 				}
 				if(isNormalWalk)
@@ -1336,12 +1335,12 @@
 					if(Math.abs(normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep) >= Math.PI/2)
 						normalWalkAnimDirection *= -1;
 
-					// Calculate new rotation angles
+					// Calculate new rotation angle
 					normalWalkAnimY = normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep;
 				}
 				if(isDachshund)
 				{
-					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					// If the length of the body is bigger than 2 times the initial length or less that the initial length, change direction
 					if(14 * dachsHundAnimScale > 28 || 14 * dachsHundAnimScale < 14)
 						dachsHundAnimDirection *= -1;
 
@@ -1356,7 +1355,7 @@
 					// Calculate the angle for the tail rotation 
 					cartoonAnimTailAngle = (cartoonAnimTailAngle + cartoonAnimTailStep) % (Math.PI * 2);
 
-					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					// If the length of the body is bigger than 2 times the initial length or less that the initial length change direction
 					if(5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep > 8 || 5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep < 5)
 						cartoonAnimPawDirection *= -1;
 
@@ -1364,7 +1363,7 @@
 					cartoonAnimPawScale = cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep;
 					cartoonAnimPawLength = 5 * cartoonAnimPawScale;
 
-					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					// If the length of the body is bigger than 2 times the initial length or less that the initial length change direction
 					if(3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep > 6 || 3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep < 3)
 						cartoonAnimNeckDirection *= -1;
 
@@ -1384,7 +1383,7 @@
 
 				if(isHead)
 				{
-					// If the angle is going to be bigger than 90 degrees change direction
+					// If the angle is bigger than 90 degrees change direction
 					if(Math.abs(headAnimZ + headAnimDirection * headAnimStep) >= Math.PI/2)
 						headAnimDirection *= -1;
 
@@ -1394,7 +1393,7 @@
 
 				if(isTail)
 				{
-					// If the angle is going to be bigger than 90 degrees change direction
+					// If the angle is bigger than 90 degrees change direction
 					if(Math.abs(tailAnimX + tailAnimDirection * tailAnimStep) >= Math.PI/2)
 						tailAnimDirection *= -1;
 
