@@ -78,6 +78,7 @@
 			var deltaMouseY = 0;
 			var mouseSensitivityX = 1/5000;
 			var mouseSensitivityY = 1/500;
+			var mainAnimation = false;
 
 			var headAnimZ = 0;
 			var headAnimStep = 0.05;
@@ -973,56 +974,7 @@
 
 			function handleMouseWheel(event) 
 			{
-				var isHead = document.getElementById('Head').checked;
-				var isFLPaw = document.getElementById('FrontLeftPaw').checked;
-				var isFRPaw = document.getElementById('FrontRightPaw').checked;
-				var isTail = document.getElementById('Tail').checked;
 				var isCamera = document.getElementById('cHeight').checked;
-				var isPlayDead = document.getElementById('playDead').checked;
-				var isStaticWalk = document.getElementById('staticWalk').checked;
-				var isNormalWalk = document.getElementById('normalWalk').checked;
-				var isDachshund = document.getElementById('dachshund').checked;
-				var isCartoon = document.getElementById('cartoon').checked;
-
-				if(isHead)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(Math.abs(headAnimZ + headAnimDirection * headAnimStep) >= Math.PI/2)
-						headAnimDirection *= -1;
-
-					// Calculate new rotation angle
-					headAnimZ = headAnimZ + headAnimDirection * headAnimStep;
-				}
-
-				if(isTail)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(Math.abs(tailAnimX + tailAnimDirection * tailAnimStep) >= Math.PI/2)
-						tailAnimDirection *= -1;
-
-					// Calculate new rotation angle
-					tailAnimX = tailAnimX + tailAnimDirection * tailAnimStep;
-				}
-
-				if(isFLPaw)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(FLPAnimY + FLPAnimDirection * FLPAnimStep <= -Math.PI/2 || FLPAnimY + FLPAnimDirection * FLPAnimStep > 0)
-						FLPAnimDirection *= -1;
-
-					// Calculate new rotation angle
-					FLPAnimY = FLPAnimY + FLPAnimDirection * FLPAnimStep;
-				}
-				
-				if(isFRPaw)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(FRPAnimY + FRPAnimDirection * FRPAnimStep <= -Math.PI/2 || FRPAnimY + FRPAnimDirection * FRPAnimStep > 0)
-						FRPAnimDirection *= -1;
-
-					// Calculate new rotation angle
-					FRPAnimY = FRPAnimY + FRPAnimDirection * FRPAnimStep;
-				}
 				
 				if(isCamera)
 				{
@@ -1033,68 +985,10 @@
 						camDistance = camDistance*0.97;
 				}
 
-				if(isPlayDead)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(playDeadAnimX + playDeadAnimDirection * playDeadAnimStep <= -Math.PI/2 || playDeadAnimX + playDeadAnimDirection * playDeadAnimStep > 0)
-						playDeadAnimDirection *= -1;
+				handleSimpleAnimations();
 
-					// Calculate new rotation angle
-					playDeadAnimX = playDeadAnimX + playDeadAnimDirection * playDeadAnimStep;
-				}
-
-				if(isStaticWalk)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(Math.abs(staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep) >= Math.PI/2)
-						staticWalkAnimDirection *= -1;
-
-					// Calculate new rotation angles
-					staticWalkAnimY = staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep;
-				}
-				if(isNormalWalk)
-				{
-					// If the angle is going to be bigger than 90 degrees change direction
-					if(Math.abs(normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep) >= Math.PI/2)
-						normalWalkAnimDirection *= -1;
-
-					// Calculate new rotation angles
-					normalWalkAnimY = normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep;
-				}
-
-				if(isDachshund)
-				{
-					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
-					if(14 * dachsHundAnimScale > 28 || 14 * dachsHundAnimScale < 14)
-						dachsHundAnimDirection *= -1;
-
-					
-					// Calculate new animation scale
-					dachsHundAnimScale = dachsHundAnimScale + dachsHundAnimDirection*dachsHundAnimStep;
-					dachsHundAnimLength = 14 * dachsHundAnimScale;
-				}
-					
-				if(isCartoon)
-				{
-					// Calculate the angle for the tail rotation 
-					cartoonAnimTailAngle = (cartoonAnimTailAngle + cartoonAnimTailStep) % (Math.PI * 2);
-
-					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
-					if(5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep > 8 || 5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep < 5)
-						cartoonAnimPawDirection *= -1;
-
-					// Calculate new animation scale
-					cartoonAnimPawScale = cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep;
-					cartoonAnimPawLength = 5 * cartoonAnimPawScale;
-
-					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
-					if(3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep > 6 || 3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep < 3)
-						cartoonAnimNeckDirection *= -1;
-
-					// Calculate new animation scale
-					cartoonNeckScale = cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep;
-					cartoonNeckLength = 3 * cartoonNeckScale;
-				}
+				if(!mainAnimation)
+					handleMainAnimations();
 
 				// Redraw frame
 				if(!requestId) 
@@ -1409,21 +1303,197 @@
 				mouseDown = false;
 			}
 
+			function handleMainAnimations()
+			{
+				var isPlayDead = document.getElementById('playDead').checked;
+				var isStaticWalk = document.getElementById('staticWalk').checked;
+				var isNormalWalk = document.getElementById('normalWalk').checked;
+				var isDachshund = document.getElementById('dachshund').checked;
+				var isCartoon = document.getElementById('cartoon').checked;
+
+				if(isPlayDead)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(playDeadAnimX + playDeadAnimDirection * playDeadAnimStep <= -Math.PI/2 || playDeadAnimX + playDeadAnimDirection * playDeadAnimStep > 0)
+						playDeadAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					playDeadAnimX = playDeadAnimX + playDeadAnimDirection * playDeadAnimStep;
+				}
+
+				if(isStaticWalk)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep) >= Math.PI/2)
+						staticWalkAnimDirection *= -1;
+
+					// Calculate new rotation angles
+					staticWalkAnimY = staticWalkAnimY + staticWalkAnimDirection * staticWalkAnimStep;
+				}
+				if(isNormalWalk)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep) >= Math.PI/2)
+						normalWalkAnimDirection *= -1;
+
+					// Calculate new rotation angles
+					normalWalkAnimY = normalWalkAnimY + normalWalkAnimDirection * normalWalkAnimStep;
+				}
+				if(isDachshund)
+				{
+					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					if(14 * dachsHundAnimScale > 28 || 14 * dachsHundAnimScale < 14)
+						dachsHundAnimDirection *= -1;
+
+					
+					// Calculate new animation scale
+					dachsHundAnimScale = dachsHundAnimScale + dachsHundAnimDirection*dachsHundAnimStep;
+					dachsHundAnimLength = 14 * dachsHundAnimScale;
+				}
+					
+				if(isCartoon)
+				{
+					// Calculate the angle for the tail rotation 
+					cartoonAnimTailAngle = (cartoonAnimTailAngle + cartoonAnimTailStep) % (Math.PI * 2);
+
+					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					if(5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep > 8 || 5 * cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep < 5)
+						cartoonAnimPawDirection *= -1;
+
+					// Calculate new animation scale
+					cartoonAnimPawScale = cartoonAnimPawScale + cartoonAnimPawDirection*cartoonAnimPawStep;
+					cartoonAnimPawLength = 5 * cartoonAnimPawScale;
+
+					// If the length of the body is going to be bigger than 2 times the initial length or less that the initial length change direction
+					if(3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep > 6 || 3 * cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep < 3)
+						cartoonAnimNeckDirection *= -1;
+
+					// Calculate new animation scale
+					cartoonNeckScale = cartoonNeckScale + cartoonAnimNeckDirection*cartoonNeckStep;
+					cartoonNeckLength = 3 * cartoonNeckScale;
+				}
+			}
+
+			function handleSimpleAnimations()
+			{
+				var isHead = document.getElementById('Head').checked;
+				var isFLPaw = document.getElementById('FrontLeftPaw').checked;
+				var isFRPaw = document.getElementById('FrontRightPaw').checked;
+				var isTail = document.getElementById('Tail').checked;
+				
+
+				if(isHead)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(headAnimZ + headAnimDirection * headAnimStep) >= Math.PI/2)
+						headAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					headAnimZ = headAnimZ + headAnimDirection * headAnimStep;
+				}
+
+				if(isTail)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(Math.abs(tailAnimX + tailAnimDirection * tailAnimStep) >= Math.PI/2)
+						tailAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					tailAnimX = tailAnimX + tailAnimDirection * tailAnimStep;
+				}
+
+				if(isFLPaw)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(FLPAnimY + FLPAnimDirection * FLPAnimStep <= -Math.PI/2 || FLPAnimY + FLPAnimDirection * FLPAnimStep > 0)
+						FLPAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					FLPAnimY = FLPAnimY + FLPAnimDirection * FLPAnimStep;
+				}
+				
+				if(isFRPaw)
+				{
+					// If the angle is going to be bigger than 90 degrees change direction
+					if(FRPAnimY + FRPAnimDirection * FRPAnimStep <= -Math.PI/2 || FRPAnimY + FRPAnimDirection * FRPAnimStep > 0)
+						FRPAnimDirection *= -1;
+
+					// Calculate new rotation angle
+					FRPAnimY = FRPAnimY + FRPAnimDirection * FRPAnimStep;
+				}
+			}
+
+			function initializeAnimationVars()
+			{
+				headAnimZ = 0;
+				headAnimStep = 0.05;
+				headAnimDirection = 1;
+
+				tailAnimX = 0;
+				tailAnimStep = 0.05;
+				tailAnimDirection = 1;
+
+				FLPAnimY = 0;
+				FLPAnimStep = 0.05;
+				FLPAnimDirection = 1;
+
+				FRPAnimY = 0;
+				FRPAnimStep = 0.05;
+				FRPAnimDirection = 1;
+
+				playDeadAnimX = 0;
+				playDeadAnimStep = 0.05;
+				playDeadAnimDirection = 1;
+
+				staticWalkAnimY = 0;
+				staticWalkAnimStep = 0.05;
+				staticWalkAnimDirection = 1;
+
+				normalWalkAnimY = 0;
+				normalWalkAnimStep = 0.05;
+				normalWalkAnimDirection = 1;
+
+				dachsHundAnimLength = 14;
+				dachsHundAnimStep = 0.05;
+				dachsHundAnimDirection = 1;
+				dachsHundAnimScale = 1;
+
+				cartoonAnimPawStep = 0.03;
+				cartoonAnimPawScale = 1;
+				cartoonAnimPawLength = 5;
+				cartoonAnimPawDirection = 1;
+				cartoonAnimTailAngle = 0;
+				cartoonAnimTailStep = 0.1;
+				cartoonNeckLength = 3;
+				cartoonAnimNeckDirection = 1;
+				cartoonNeckStep = 0.05;
+				cartoonNeckScale = 1;
+			}
+
 			function startAnim() 
 			{
 				if (!requestId)
+				{
+					mainAnimation = true;
+					initializeAnimationVars()
 					anim();
+				}		
 			}
 
 			function anim() 
 			{
 				requestId = window.requestAnimationFrame(anim);
+
+				if(mainAnimation)
+					handleMainAnimations();
+
 				redraw();
 			}
 
 			function stopAnim() 
 			{
 				window.cancelAnimationFrame(requestId);
+				mainAnimation = false;
 				requestId = 0;
 			}
 		</script>
@@ -1484,28 +1554,33 @@
 					<div class="row justify-content-center mt-1">
 						<div class="col-2">
 							<div>
-								<input type="radio" id="playDead" name="anim" value="playDead">
+								<input type="radio" id="playDead" name="anim" value="playDead" onclick="initializeAnimationVars()">
 								<label for="Left">Play Dead</label>
 							</div>	
 
 							<div>
-								<input type="radio" id="staticWalk" name="anim" value="staticWalk">
+								<input type="radio" id="staticWalk" name="anim" value="staticWalk" onclick="initializeAnimationVars()">
 								<label for="Bottom">Static Walk</label>
 							</div>		
 							
 							<div>
-								<input type="radio" id="normalWalk" name="anim" value="normalWalk">
+								<input type="radio" id="normalWalk" name="anim" value="normalWalk" onclick="initializeAnimationVars()">
 								<label for="Back">Normal Walk</label>
 							</div>		
 							
 							<div>
-								<input type="radio" id="dachshund" name="anim" value="dachshund">
+								<input type="radio" id="dachshund" name="anim" value="dachshund" onclick="initializeAnimationVars()">
 								<label for="Back">Dachshund</label>
 							</div>		
 
 							<div>
-								<input type="radio" id="cartoon" name="anim" value="cartoon">
+								<input type="radio" id="cartoon" name="anim" value="cartoon" onclick="initializeAnimationVars()">
 								<label for="Back">Cartoon</label>
+							</div>
+
+							<div>
+								<input type="radio" id="none" name="anim" value="none" onclick="initializeAnimationVars()">
+								<label for="Back">None</label>
 							</div>
 						</div>
 					</div>
