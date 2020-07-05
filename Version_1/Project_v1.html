@@ -275,13 +275,13 @@
 
 			function redraw() 
 			{	
+				var x, y, z;
 
 				// Get the user inputs 
 				var isRight = document.getElementsByName('x')[0].checked;
 				var isTop = document.getElementsByName('y')[0].checked;
 				var isFront = document.getElementsByName('z')[0].checked;
 				var camAngle = parseFloat(document.getElementById('cAngle').value);
-				var x, y, z;
 				var camDistance = parseFloat(document.getElementById('cDistance').value);
 			
 				// Calculate the camera angle from degrees to rad and prevent overflow
@@ -383,35 +383,17 @@
 				// Draw the first scene
 				redraw(); 
 			}
-
-			function startAnim() 
-			{
-				if (!requestId)
-					anim();
-			}
-
-			function anim() 
-			{
-				requestId = window.requestAnimationFrame(anim);
-				redraw();
-			}
-
-			function stopAnim() 
-			{
-				window.cancelAnimationFrame(requestId);
-				requestId = 0;
-			}
 		</script>
 	</head>
 
 	<body onload="startup()">
 		<div class="container-fluid style" style="margin-top: 2%; margin-left: 2%;">
 			<div class="row align-items-center">
-				<div class="col-8 justify-content-start">
+				<div class="col justify-content-start">
 					<canvas id="myGLCanvas" >
 					</canvas>
 				</div>
-				<div class="col-2 align-middle">
+				<div class="col-4 align-middle">
 					<div class="row justify-content-center mb-1">
 						<h1 class="mt-5">Camera angle</h1>
 					</div>
@@ -432,8 +414,8 @@
 						<h1 class="mt-5">Camera position</h1>
 					</div>
 
-					<div class="row justify-content-around">
-						<div class="col-4">
+					<div class="row justify-content-center">
+						<div class="col-2">
 							<div>
 								<input type="radio" id="Right" name="x" value="Right" checked="true">
 								<label for="Right">Right</label>
@@ -450,7 +432,7 @@
 							</div>			
 						</div>
 						
-						<div class="col-4">
+						<div class="col-2">
 							<div>
 								<input type="radio" id="Left" name="x" value="Left">
 								<label for="Left">Left</label>
