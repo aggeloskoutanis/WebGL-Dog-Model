@@ -68,13 +68,13 @@
 			var skyTexture;
 			var floorVBuffer;
 			var floorIBuffer;
-			var mouseDown = false; // flag ότι κουμπί του ποντικιού είναι πατημένο
-			var deltaFresh = false; // όταν κρατάμε πατημένο το κουμπί στο animation, το deltaX, deltaY χρησιμοποιούνται επανειλημένα // αυτό το flag θα το εμποδίζει αυτό
-			var lastMouseX = null; // Τελευταία καταγεγεραμμένη θέση ποντικιού στον καμβά
+			var mouseDown = false; // Flag that indicated that mouse button is pressed
+			var deltaFresh = false; // Stop getting new Delta values while holding down animation button
+			var lastMouseX = null; // Last registered mouse position on Canvas
 			var lastMouseY = null; 
-			var currMouseX = null; // Τρέχουσα θέση ποντικιού στον καμβά
+			var currMouseX = null; // Current mouse position on Canvas
 			var currMouseY = null;
-			var deltaMouseX = 0; // Διαφορά τρέχουσας - τελευταίας καταγεγραμμένης θέσης
+			var deltaMouseX = 0; // Diffence between current and last mouse position
 			var deltaMouseY = 0;
 			var mouseSensitivityX = 1/5000;
 			var mouseSensitivityY = 1/500;
@@ -362,7 +362,7 @@
 				headTextureBuffer = gl.createBuffer();
 				gl.bindBuffer(gl.ARRAY_BUFFER, headTextureBuffer);
 				
-				// The faces get the right portion of the texture image
+				// The sides get the right portion of the texture image
 				var headTextureCoordinates=[
 					// Back
 					0.0, 1.0,
@@ -446,9 +446,6 @@
 
 				// Calculate the camera angle from degrees to rad and prevent overflow
 				camAngle = (camAngle%360)*Math.PI/180.0;
-
-				// Calculate the camera rotation from degrees to rad
-				// camRot = camRot*Math.PI/180.0;
 
 				// If mouse is clicked
 				if(mouseDown && deltaFresh)
